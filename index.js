@@ -21,7 +21,8 @@ http.listen(3000, () => {
     console.log('listening on *:3000');
 });
 
-socket.on('new user', (user) => {
+io.on('newUser', function (user) {
     users.push(user);
-    io.emit('users' ,users);
+
+    socket.emit('users' ,users);
 });
