@@ -115,11 +115,13 @@
             email: email.value,
             img: ''
         });
+
+        socket.on('users', (users) => {
+            console.log(users);
+        })
     });
 
-    socket.on('users', users => {
-        console.log(users);
-    })
+
 
 </script>
 </body>
