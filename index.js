@@ -1,18 +1,27 @@
-const app = require('express')();
-const http = require('http').Server(app);
+const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const port = process.env.PORT || 3000;
+
+var users = [];
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/Public/index.html');
 });
+
+app.use(express.static('/Public'));
 
 io.on('connection', (socket) => {
-  socket.on('chat message', msg => {
-    io.emit('chat message', msg);
-  });
+    socket.on('chat message', (msg) => {
+        io.emit('chat message', msg);
+    });
 });
 
-http.listen(port, () => {
-  console.log(`Socket.IO server running at http://localhost:${port}/`);
+http.listen(3000, () => {
+    console.log('listening on *:3000');
+});
+
+socket.on('new user', (user) => {
+    users.push(user);
+    io.emit('users' ,users);
 });
