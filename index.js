@@ -6,8 +6,8 @@ const io = require('socket.io')(http);
 var users = [];
 
 app.get('/', (req, res) => {
-    //res.sendFile(__dirname + '/Public/index.html');
-    res.send("Test");
+    res.sendFile(__dirname + '/Public/index.html');
+    //res.send("Test");
 });
 
 app.use(express.static('/Public'));
@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
     });
 });
 
-http.listen(80, () => {
+http.listen(3000, () => {
     console.log('listening on *:80');
 });
 
