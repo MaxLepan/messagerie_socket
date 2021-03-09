@@ -85,12 +85,28 @@
     //moi
     var socket = io("ws://localhost:3000");
     var message = document.getElementById('message');
+    var messages = document.getElementById('messages');
     var input = document.getElementById('input');
     var login = document.getElementById('login');
     var pseudo = document.getElementById('pseudo');
     var email = document.getElementById('email');
     var writerArea = document.getElementById('writerArea');
+    function myMessage(item, msg) {
+        item.innerHTML =
+            "<div>" +
+            "<div><h3>"+ msg["user"] +"</h3></div>" +
+            "<div>"+ msg["message"] +"</div>" +
+            "</div>"+
+            "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>"
 
+    }
+    function otherMessage(item, msg){
+        item.innerHTML = "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+            "<div>" +
+            "<div><h3>" + msg["user"] + "</h3></div>" +
+            "<div>" + msg["message"] + "</div>" +
+            "</div>"
+    }
 
     message.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -105,19 +121,9 @@
     socket.on('chat message', function(msg) {
         var item = document.createElement('li');
         if (email.value === msg['userMail']) {
-            item.innerHTML =
-                "<div>" +
-                "<div><h3>"+ pseudo.value +"</h3></div>" +
-                "<div>"+ msg["message"] +"</div>" +
-                "</div>"+
-                "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>"
-
+            myMessage(item, msg);
         } else {
-            item.innerHTML = "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
-                "<div>" +
-                "<div><h3>" + msg["user"] + "</h3></div>" +
-                "<div>" + msg["message"] + "</div>" +
-                "</div>"
+            otherMessage(item, msg);
         }
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
@@ -150,7 +156,21 @@
     });
 
     socket.on('users', (users) => {
-        console.log(users);
+
+        socket.on('draw old messages', (msg) =>{
+            console.log(msg.length);
+
+            for ( let i = 0; i< msg.length;i++){
+                let item = document.createElement('li');
+                if (email.value === msg[i]['userMail']) {
+                    myMessage(item, msg[i]);
+                } else {
+                    otherMessage(item, msg[i]);
+                }
+                messages.appendChild(item);
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        })
     })
 
     input.addEventListener('input', () => {
