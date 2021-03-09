@@ -7,11 +7,9 @@
     "socket.io": "^3.1.2"
   },
   "scripts": {
-  "start": "node index.js"
-},
+    "start": "node index.js"
+  },
   "engines": {
-   "node": "14.16.0"
-   }
+    "node": "14.16.0"
+  }
 }
-
-

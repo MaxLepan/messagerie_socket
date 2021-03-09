@@ -109,15 +109,12 @@
     });
 
     login.addEventListener('submit', function(e) {
-        //console.log('login click');
         e.preventDefault();
         socket.emit('newUser', {
             pseudo: pseudo.value,
             email: email.value,
             img: ''
         });
-
-
     });
 
     socket.on('users', (users) => {
