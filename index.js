@@ -15,14 +15,17 @@ io.on('connection', (socket) => {
     socket.on('chat message', (msg) => {
         io.emit('chat message', msg);
     });
+
+    socket.on('newUser', function (user) {
+        console.log(users);
+        users.push(user);
+
+        socket.emit('users' ,users);
+
+    });
 });
 
 http.listen(3000, () => {
     console.log('listening on *:3000');
 });
 
-io.on('newUser', function (user) {
-    users.push(user);
-
-    socket.emit('users' ,users);
-});
