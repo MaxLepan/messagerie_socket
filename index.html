@@ -77,7 +77,7 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    var socket = io();
+    var socket = io("ws://localhost:3000");
     var message = document.getElementById('message');
     var input = document.getElementById('input');
     var login = document.getElementById('login');
@@ -100,8 +100,8 @@
         var item = document.createElement('li');
         item.innerHTML = "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
             "<div>" +
-                "<div><h3>"+ pseudo.value +"</h3></div>" +
-                "<div>"+ msg +"</div>" +
+            "<div><h3>"+ pseudo.value +"</h3></div>" +
+            "<div>"+ msg +"</div>" +
             "</div>"
         //item.textContent = msg;
         messages.appendChild(item);
@@ -109,18 +109,20 @@
     });
 
     login.addEventListener('submit', function(e) {
+        //console.log('login click');
         e.preventDefault();
-        socket.emit('new user', {
+        socket.emit('newUser', {
             pseudo: pseudo.value,
             email: email.value,
             img: ''
         });
 
-        socket.on('users', (users) => {
-            console.log(users);
-        })
+
     });
 
+    socket.on('users', (users) => {
+        console.log(users);
+    })
 
 
 </script>
