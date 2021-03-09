@@ -6,7 +6,8 @@ const io = require('socket.io')(http);
 var users = [];
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/Public/index.html');
+    //res.sendFile(__dirname + '/Public/index.html');
+    res.send("Test");
 });
 
 app.use(express.static('/Public'));
