@@ -30,8 +30,9 @@ io.on('connection', (socket) => {
     socket.on('newUser', function (user) {
 
         users.push(user);
-
         socket.emit('users' ,users);
+        console.log(messages);
+        socket.emit('draw old messages', messages)
         console.log(users);
 
         socket.broadcast.emit('connectedUsers', user);
