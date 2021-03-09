@@ -128,6 +128,8 @@
         } else {
             otherMessage(item, msg);
         }
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
     });
     socket.on('writingUsers', (writers) => {
     if (writers.length !== 0) {
