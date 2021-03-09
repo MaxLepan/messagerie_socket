@@ -7,6 +7,7 @@ var users = [];
 var messages = [];
 var writers = [];
 
+
 var writerBool = true;
 var writerBool2 = false;
 
@@ -17,6 +18,8 @@ app.get('/', (req, res) => {
 app.use(express.static('public'));
 
 io.on('connection', (socket) => {
+
+
 
     socket.on('chat message', (msg) => {
         io.emit('chat message', msg);
@@ -31,12 +34,29 @@ io.on('connection', (socket) => {
         console.log(messages);
         socket.emit('draw old messages', messages)
         console.log(users);
+
+        socket.broadcast.emit('connectedUsers', user);
+
+
+    });
+
+    socket.on('disconnect', () => {
+        for (let i = 0; i<users.length; i++){
+            if (socket['id'] === users[i]['socketKey']){
+                console.log(users[i]['socketKey']);
+                console.log(socket['id']);
+                io.emit('disconnected', users[i]['pseudo']);
+
+            }
+        }
+        //console.log(socket['id']);
+
     });
 
     socket.on('writingUsers', (writer) => {
         console.log(writer);
         writerBool = true;
-        for (var i =0; i<writers.length; i++){
+        for (let i =0; i<writers.length; i++){
             if (writers[i] === writer){
                 console.log("test");
                 writerBool = false;
@@ -66,6 +86,8 @@ io.on('connection', (socket) => {
 
         socket.broadcast.emit('writingUsers', writers);
     })
+
+
 });
 
 http.listen(3000, () => {
