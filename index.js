@@ -6,7 +6,7 @@ const io = require('socket.io')(http);
 var users = [];
 var messages = [];
 var writers = [];
-
+var newUser=false;
 
 var writerBool = true;
 var writerBool2 = false;
@@ -28,8 +28,18 @@ io.on('connection', (socket) => {
     });
 
     socket.on('newUser', function (user) {
-
-        users.push(user);
+        newUser=false;
+        for(let i = 0;i<users.length;i++ ){
+            if (user["userMail"] === users[i]["userMail"]){
+                users[i]["pseudo"] = user["pseudo"];
+                users[i]["socketKey"] = user["socketKey"];
+            }else {
+                newUser=true;
+            }
+        }
+        if (newUser){
+            users.push(user);
+        }
         socket.emit('users' ,users);
         //console.log(messages);
         socket.emit('draw old messages', messages)
