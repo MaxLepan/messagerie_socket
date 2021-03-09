@@ -120,7 +120,6 @@
         }
     });
 
-
     socket.on('chat message', function(msg) {
         var item = document.createElement('li');
         if (email.value === msg['userMail']) {
@@ -131,6 +130,7 @@
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     });
+
     socket.on('writingUsers', (writers) => {
     if (writers.length !== 0) {
         writerArea.innerHTML = "<div>"
@@ -160,11 +160,12 @@
             pseudo: pseudo.value,
             email: email.value,
             img: '',
-            socketKey: socket['id']
+            socketKey: socket['id'],
+            online: true
         });
     });
 
-    socket.on('users', (users) => {
+    socket.on('users', () => {
 
         socket.on('draw old messages', (msg) =>{
             console.log(msg.length);
@@ -181,6 +182,7 @@
             }
         })
     })
+
     socket.on('connectedUsers', (users) => {
         //console.log(users);
         connectedUser.innerHTML = users['pseudo'] + " is connected.";
