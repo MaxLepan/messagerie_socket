@@ -6,6 +6,8 @@ const io = require('socket.io')(http);
 var users = [];
 var messages = [];
 var writers = [];
+var offlineUsers = [];
+var onlineUsers = [];
 var newUser=false;
 
 var writerBool = true;
@@ -28,7 +30,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('newUser', function (user) {
-        console.log(users);
+        //console.log(users);
         newUser=true;
         for(let i = 0;i<users.length;i++ ){
             if (user["userMail"] === users[i]["userMail"]){
@@ -39,11 +41,13 @@ io.on('connection', (socket) => {
         }
         if (newUser){
             users.push(user);
+            onlineUsers.push(user);
+            console.log(onlineUsers);
         }
         socket.emit('users' ,users);
         //console.log(messages);
         socket.emit('draw old messages', messages)
-        console.log(users);
+        //console.log(users);
 
         socket.broadcast.emit('connectedUsers', user);
 
@@ -51,7 +55,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log(users);
+
         for (let i = 0; i<users.length; i++){
 
             if (socket['id'] === users[i]['socketKey']){
@@ -60,10 +64,17 @@ io.on('connection', (socket) => {
                 users[i]['online'] = false;
                 io.emit('disconnected', users[i]['pseudo']);
 
+                //offline users
+                //console.log(users[i]);
+                offlineUsers.push(users[i]);
+                console.log(onlineUsers);
+                onlineUsers.splice(users[i], 1);
             }
-            //if (users[i][]){
 
-            //}
+            //online users
+            if (users[i]['online']){
+                console.log(users[i]);
+            }
         }
 
     });
