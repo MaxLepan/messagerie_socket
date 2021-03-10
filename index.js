@@ -6,17 +6,17 @@ var users = [];
 var messages = [];
 var writers = [];
 var connectedUsers = [];
-var newUser=false;
+var newUser = false;
 var groups = [
     {
-        name : "General",
+        name: "General",
         users: [],
-        img : ''
+        img: ''
     },
     {
-        name : "group2",
+        name: "group2",
         users: [],
-        img : ''
+        img: ''
     }
 ];
 var writerBool = true;
@@ -31,7 +31,6 @@ app.use(express.static('public'));
 io.on('connection', (socket) => {
 
 
-
     socket.on('chat message', (msg) => {
         io.emit('chat message', msg);
         messages.push(msg);
@@ -40,23 +39,22 @@ io.on('connection', (socket) => {
 
     socket.on('newUser', function (user) {
 
-        newUser=true;
+        newUser = true;
 
-        for(let i = 0;i<users.length;i++ ){
-            if (user["email"] === users[i]["email"]){
+        for (let i = 0; i < users.length; i++) {
+            if (user["email"] === users[i]["email"]) {
                 users[i]["pseudo"] = user["pseudo"];
                 users[i]["socketKey"] = user["socketKey"];
                 users[i]["online"] = user["online"];
-                newUser=false;
+                newUser = false;
             }
         }
-        if (newUser){
+        if (newUser) {
             users.push(user);
-            connectedUsers.push(user);
         }
-        socket.emit('users' ,users);
+        socket.emit('users', users);
         socket.emit('draw groups', groups);
-        io.emit('participants', connectedUsers);
+        io.emit('participants', users);
         //console.log(users);
 
         socket.broadcast.emit('connectedUsers', user);
@@ -64,7 +62,7 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on('choice group', (group) =>{
+    socket.on('choice group', (group) => {
         console.log(messages);
         let groupMessages = messages.filter(message => message["group"] === group);
         console.log(groupMessages);
@@ -72,15 +70,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        const index = connectedUsers.findIndex(user => user.socketKey === socket.id);
 
-        if (index !== -1) {
-            connectedUsers.splice(index, 1);
-        }
-        io.emit('participants', connectedUsers);
 
-        for (let i = 0; i<users.length; i++){
-            if (socket['id'] === users[i]['socketKey']){
+        for (let i = 0; i < users.length; i++) {
+            if (socket['id'] === users[i]['socketKey']) {
                 //console.log(users[i]['socketKey']);
                 //console.log(socket['id']);
                 users[i]['online'] = false;
@@ -88,17 +81,18 @@ io.on('connection', (socket) => {
 
             }
 
-            if (users[i]['online']){
+            if (users[i]['online']) {
                 console.log(users[i]);
             }
+            io.emit('participants', users);
         }
 
     });
 
     socket.on('writingUsers', (writer) => {
         writerBool = true;
-        for (let i =0; i<writers.length; i++){
-            if (writers[i] === writer){
+        for (let i = 0; i < writers.length; i++) {
+            if (writers[i] === writer) {
                 writerBool = false;
             }
         }
@@ -111,8 +105,8 @@ io.on('connection', (socket) => {
 
     socket.on('noWritingUsers', (writer) => {
         writerBool2 = false;
-        for (var i =0; i<writers.length; i++){
-            if (writers[i] === writer){
+        for (var i = 0; i < writers.length; i++) {
+            if (writers[i] === writer) {
                 writerBool2 = true;
             }
         }
