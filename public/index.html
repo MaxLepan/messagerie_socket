@@ -9,6 +9,10 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
+        #listGroup {
+            flex-direction: column;
+        }
+
         #room {
             background: rgba(0, 0, 0, 0.15);
             padding: 0.25rem;
@@ -124,14 +128,15 @@
 <div id="listGroup" style="display : none">
     <form id="searchGroup" action="">
         <input id="inputSearchGroup" autocomplete="off"/>
+        <button>search</button>
     </form>
     <ul id="groups">
     </ul>
+    <div>
+        <ul id="onlineUsers"></ul>
+    </div>
 </div>
-<div>
-    <h4>Online users</h4>
-    <ul id="onlineUsers"></ul>
-</div>
+
 <div id="discussion" style="display : none">
     <div><h1 id="titleRoom"></h1></div>
     <ul id="messages">
@@ -183,7 +188,6 @@
     }
 
     function selectRoom() {
-        console.log("on arrive là");
         document.querySelectorAll(".room").forEach(function (group) {
             group.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -331,15 +335,30 @@
     });
 
     socket.on('participants', (users) => {
-        let connectedUsers = onlineUsers;
-        connectedUsers.innerHTML = "";
+        onlineUsers.innerHTML = "";
+        let usersOnline = users.filter(user => user["online"] === true);
+        let usersOffline = users.filter(user => user["online"] === false);
+        let item = document.createElement('li');
+        item.innerHTML = "<h4>Online users</h4>";
+        onlineUsers.appendChild(item);
+        for (let i = 0; i < usersOnline.length; i++) {
+            let item = document.createElement('li');
+            item.innerHTML = "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+                "<div><h3>" + usersOnline[i]["pseudo"] + "</h3></div>";
+            onlineUsers.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        };
+        item = document.createElement('li');
+        item.innerHTML = "<h4>Offline users</h4>";
+        onlineUsers.appendChild(item);
+        for (let i = 0; i < usersOffline.length; i++) {
+            let item = document.createElement('li');
+            item.innerHTML = "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+                "<div><h3>" + usersOffline[i]["pseudo"] + "</h3></div>";
+            onlineUsers.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        };
 
-        users.forEach(user => {
-            connectedUsers.innerHTML += `
-            <li> <div><img class='image_user' src='https://www.gravatar.com/avatar/${hash}'></div>
-            <p>${user.pseudo}</p>
-            </li>`
-        })
     })
 
     socket.on('connectedUsers', (users) => {
