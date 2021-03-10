@@ -9,7 +9,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        #group {
+        #room {
             background: rgba(0, 0, 0, 0.15);
             padding: 0.25rem;
             position: fixed;
@@ -34,7 +34,7 @@
             outline: none;
         }
 
-        #group > button {
+        #room > button {
             background: #333;
             border: none;
             padding: 0 1rem;
@@ -113,7 +113,7 @@
     </style>
 </head>
 <body>
-<div id = "connexion" style="display : flex">
+<div id="connexion" style="display : flex">
     <form action="" id="login">
         <input id="email" placeholder="Email" type="email" required>
         <input id="pseudo" autocomplete="off" placeholder="Pseudo" required>
@@ -121,14 +121,19 @@
     </form>
 </div>
 
-<div id = "listGroup" style="display : none">
+<div id="listGroup" style="display : none">
     <form id="searchGroup" action="">
-        <input id="inputSearchGroup" autocomplete="off" /><button>search</button>
+        <input id="inputSearchGroup" autocomplete="off"/>
+        <button>search</button>
     </form>
     <ul id="groups">
     </ul>
 </div>
-<div id = "discussion" style="display : none">
+<div>
+    <h4>Online users</h4>
+    <ul id="onlineUsers"></ul>
+</div>
+<div id="discussion" style="display : none">
     <div><h1 id="titleRoom"></h1></div>
     <ul id="messages">
 
@@ -137,11 +142,12 @@
 
         <div id="writerArea"></div>
         <form id="message" action="">
-            <input id="inputMessage" autocomplete="off" /><button>Send</button>
+            <input id="inputMessage" autocomplete="off"/>
+            <button>Send</button>
         </form>
     </div>
-
 </div>
+
 
 <script src="socket.io.min.js"></script>
 <script>
@@ -154,22 +160,24 @@
     var pseudo = document.getElementById('pseudo');
     var email = document.getElementById('email');
     var writerArea = document.getElementById('writerArea');
+    let onlineUsers = document.getElementById('onlineUsers');
     var discussion = document.getElementById('discussion');
     var connexion = document.getElementById('connexion');
     var groups = document.getElementById('groups');
     var titleRoom = document.getElementById('titleRoom');
     var currentGroup;
+
     function myMessage(item, msg) {
         item.innerHTML =
             "<div>" +
-            "<div><h3>"+ msg["user"] +"</h3></div>" +
-            "<div>"+ msg["message"] +"</div>" +
-            "</div>"+
+            "<div><h3>" + msg["user"] + "</h3></div>" +
+            "<div>" + msg["message"] + "</div>" +
+            "</div>" +
             "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>";
     };
 
-    function selectRoom(){
-        document.querySelectorAll(".room").forEach(function (group){
+    function selectRoom() {
+        document.querySelectorAll(".room").forEach(function (group) {
             group.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log("name room");
@@ -184,7 +192,7 @@
         });
     };
 
-    function otherMessage(item, msg){
+    function otherMessage(item, msg) {
         item.innerHTML = "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
             "<div>" +
             "<div><h3>" + msg["user"] + "</h3></div>" +
@@ -192,7 +200,7 @@
             "</div>"
     };
 
-    message.addEventListener('submit', function(e) {
+    message.addEventListener('submit', function (e) {
         e.preventDefault();
         if (inputMessage.value) {
             socket.emit('chat message', {
@@ -208,7 +216,7 @@
         }
     });
 
-    socket.on('chat message', function(msg) {
+    socket.on('chat message', function (msg) {
         let item = document.createElement('li');
         if (email.value === msg['userMail']) {
             myMessage(item, msg);
@@ -220,19 +228,18 @@
     });
 
     socket.on('writingUsers', (writers) => {
-    if (writers.length !== 0) {
-        writerArea.innerHTML = "<div>"
-        for (let i = 0; i < writers.length; i++) {
-            if (writers[i] !== pseudo.value) {
-                writerArea.innerHTML += writers[i] + ", ";
-            }
+        if (writers.length !== 0) {
+            writerArea.innerHTML = "<div>"
+            for (let i = 0; i < writers.length; i++) {
+                if (writers[i] !== pseudo.value) {
+                    writerArea.innerHTML += writers[i] + ", ";
+                }
 
-            console.log(writers);
+            }
+            writerArea.innerHTML += " is typing.</div>";
+        } else {
+            writerArea.innerHTML = '';
         }
-        writerArea.innerHTML += " is typing.</div>";
-    } else {
-        writerArea.innerHTML = '';
-    }
 
     });
 
@@ -243,7 +250,7 @@
         messages.appendChild(item);
     });
 
-    login.addEventListener('submit', function(e) {
+    login.addEventListener('submit', function (e) {
         e.preventDefault();
         socket.emit('newUser', {
             pseudo: pseudo.value,
@@ -256,11 +263,11 @@
         connexion.style.display = "none";
     });
 
-    socket.on('draw old messages', (msg) =>{
+    socket.on('draw old messages', (msg) => {
 
         console.log("in draw old message ");
 
-        for ( let i = 0; i< msg.length;i++){
+        for (let i = 0; i < msg.length; i++) {
             console.log(msg[i]['group']);
             let item = document.createElement('li');
             if (email.value === msg[i]['userMail']) {
@@ -270,17 +277,18 @@
             }
             messages.appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
-        }console.log("");
+        }
+        console.log("");
     });
 
-    socket.on('draw groups', (tabGroup) =>{
+    socket.on('draw groups', (tabGroup) => {
         console.log(tabGroup);
-        for ( let i = 0; i< tabGroup.length;i++){
+        for (let i = 0; i < tabGroup.length; i++) {
             let item = document.createElement('li');
-            item.innerHTML = "<div id='"+tabGroup[i]["name"].toLowerCase()+"'><img class='image_user' id='"+tabGroup[i]["name"].toLowerCase()+"' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
-                "<div ><h3 id='"+tabGroup[i]["name"].toLowerCase()+"'>" + tabGroup[i]["name"] + "</h3></div>"
+            item.innerHTML = "<div id='" + tabGroup[i]["name"].toLowerCase() + "'><img class='image_user' id='" + tabGroup[i]["name"].toLowerCase() + "' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+                "<div ><h3 id='" + tabGroup[i]["name"].toLowerCase() + "'>" + tabGroup[i]["name"] + "</h3></div>"
 
-            item.id =  tabGroup[i]["name"].toLowerCase();
+            item.id = tabGroup[i]["name"].toLowerCase();
             item.classList.add("room");
             groups.appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
@@ -288,6 +296,18 @@
         }
         selectRoom();
     });
+
+    socket.on('participants', (users) => {
+        let connectedUsers = onlineUsers;
+        connectedUsers.innerHTML = "";
+
+        users.forEach(user => {
+            connectedUsers.innerHTML += `
+            <li> <div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>
+            <p>${user.pseudo}</p>
+            </li>`
+        })
+    })
 
     socket.on('connectedUsers', (users) => {
         let item = document.createElement('li');
@@ -304,12 +324,6 @@
             socket.emit('noWritingUsers', pseudo.value);
         }
     });
-
-
-
-
-
-
 
 
 </script>

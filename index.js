@@ -5,6 +5,7 @@ const io = require('socket.io')(http);
 var users = [];
 var messages = [];
 var writers = [];
+var connectedUsers = [];
 var newUser=false;
 var groups = [
     {
@@ -34,10 +35,11 @@ io.on('connection', (socket) => {
     socket.on('chat message', (msg) => {
         io.emit('chat message', msg);
         messages.push(msg);
-        //console.log(messages);
+
     });
 
     socket.on('newUser', function (user) {
+
         newUser=true;
 
         for(let i = 0;i<users.length;i++ ){
@@ -50,10 +52,11 @@ io.on('connection', (socket) => {
         }
         if (newUser){
             users.push(user);
+            connectedUsers.push(user);
         }
         socket.emit('users' ,users);
         socket.emit('draw groups', groups);
-
+        io.emit('participants', connectedUsers);
         //console.log(users);
 
         socket.broadcast.emit('connectedUsers', user);
@@ -69,7 +72,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log(users);
+        const index = connectedUsers.findIndex(user => user.socketKey === socket.id);
+
+        if (index !== -1) {
+            connectedUsers.splice(index, 1);
+        }
+        io.emit('participants', connectedUsers);
+
         for (let i = 0; i<users.length; i++){
             if (socket['id'] === users[i]['socketKey']){
                 //console.log(users[i]['socketKey']);
@@ -87,16 +96,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('writingUsers', (writer) => {
-        //console.log(writer);
         writerBool = true;
         for (let i =0; i<writers.length; i++){
             if (writers[i] === writer){
-                //console.log("test");
                 writerBool = false;
             }
         }
         if (writerBool) {
-            //console.log("push");
             writers.push(writer);
         }
 
@@ -104,7 +110,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('noWritingUsers', (writer) => {
-        //console.log("il écrit pas");
         writerBool2 = false;
         for (var i =0; i<writers.length; i++){
             if (writers[i] === writer){
@@ -112,7 +117,6 @@ io.on('connection', (socket) => {
             }
         }
         if (writerBool2) {
-            //console.log("splice");
             writers.splice(writer, 1);
 
         }
