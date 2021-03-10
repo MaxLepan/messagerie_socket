@@ -9,6 +9,55 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
+        #group {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 0.25rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 3rem;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+
+        #inputSearchGroup {
+            border: none;
+            padding: 0 1rem;
+            flex-grow: 1;
+            border-radius: 2rem;
+            margin: 0.25rem;
+        }
+
+        #inputSearchGroup:focus {
+            outline: none;
+        }
+
+        #group > button {
+            background: #333;
+            border: none;
+            padding: 0 1rem;
+            margin: 0.25rem;
+            border-radius: 3px;
+            outline: none;
+            color: #fff;
+        }
+
+        #groups {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #groups > li {
+            padding: 0.5rem 1rem;
+        }
+
+        #groups > li:nth-child(odd) {
+            background: #efefef;
+        }
+
         #message {
             background: rgba(0, 0, 0, 0.15);
             padding: 0.25rem;
@@ -22,7 +71,7 @@
             backdrop-filter: blur(10px);
         }
 
-        #input {
+        #inputMessage {
             border: none;
             padding: 0 1rem;
             flex-grow: 1;
@@ -30,7 +79,7 @@
             margin: 0.25rem;
         }
 
-        #input:focus {
+        #inputMessage:focus {
             outline: none;
         }
 
@@ -64,35 +113,52 @@
     </style>
 </head>
 <body>
-<form action="" id="login">
-    <input id="email" placeholder="Email" type="email" required>
-    <input id="pseudo" autocomplete="off" placeholder="Pseudo" required>
-    <input type="submit">
-</form>
-<div id="connectedUser"></div>
+<div id = "connexion" style="display : flex">
+    <form action="" id="login">
+        <input id="email" placeholder="Email" type="email" required>
+        <input id="pseudo" autocomplete="off" placeholder="Pseudo" required>
+        <input type="submit">
+    </form>
+</div>
 
-<ul id="messages"></ul>
-<div>
+<div id = "listGroup" style="display : none">
+    <form id="searchGroup" action="">
+        <input id="inputSearchGroup" autocomplete="off" /><button>search</button>
+    </form>
+    <ul id="groups">
+    </ul>
+</div>
+<div id = "discussion" style="display : none">
+    <div><h1 id="titleRoom"></h1></div>
+    <ul id="messages">
 
-    <div id="writerArea"></div>
-<form id="message" action="">
-    <input id="input" autocomplete="off" /><button>Send</button>
-</form>
+    </ul>
+    <div>
+
+        <div id="writerArea"></div>
+        <form id="message" action="">
+            <input id="inputMessage" autocomplete="off" /><button>Send</button>
+        </form>
+    </div>
+
 </div>
 
 <script src="socket.io.min.js"></script>
 <script>
-    //moi
+    var listGroup = document.getElementById("listGroup");
     var socket = io("ws://localhost:3000");
     var message = document.getElementById('message');
     var messages = document.getElementById('messages');
-    var input = document.getElementById('input');
+    var inputMessage = document.getElementById('inputMessage');
     var login = document.getElementById('login');
     var pseudo = document.getElementById('pseudo');
     var email = document.getElementById('email');
     var writerArea = document.getElementById('writerArea');
-    var connectedUser = document.getElementById('connectedUser');
-
+    var discussion = document.getElementById('discussion');
+    var connexion = document.getElementById('connexion');
+    var groups = document.getElementById('groups');
+    var titleRoom = document.getElementById('titleRoom');
+    var currentGroup;
     function myMessage(item, msg) {
         item.innerHTML =
             "<div>" +
@@ -100,8 +166,23 @@
             "<div>"+ msg["message"] +"</div>" +
             "</div>"+
             "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>";
-    }
+    };
 
+    function selectRoom(){
+        document.querySelectorAll(".room").forEach(function (group){
+            group.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log("name room");
+                console.log(e.target.id);
+                console.log("");
+                currentGroup = e.target.id;
+                socket.emit('choice group', currentGroup);
+                listGroup.style.display = "none";
+                discussion.style.display = "flex";
+                titleRoom.innerHTML = currentGroup;
+            })
+        });
+    };
 
     function otherMessage(item, msg){
         item.innerHTML = "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
@@ -109,19 +190,26 @@
             "<div><h3>" + msg["user"] + "</h3></div>" +
             "<div>" + msg["message"] + "</div>" +
             "</div>"
-    }
+    };
 
     message.addEventListener('submit', function(e) {
         e.preventDefault();
-        if (input.value) {
-            socket.emit('chat message', {message: input.value, userMail: email.value, user: pseudo.value});
-            input.value = '';
+        if (inputMessage.value) {
+            socket.emit('chat message', {
+                message: inputMessage.value,
+                userMail: email.value,
+                user: pseudo.value,
+                group: currentGroup
+            });
+            inputMessage.value = '';
             socket.emit('noWritingUsers', pseudo.value);
+            console.log(currentGroup);
+            console.log("in sending message ");
         }
     });
 
     socket.on('chat message', function(msg) {
-        var item = document.createElement('li');
+        let item = document.createElement('li');
         if (email.value === msg['userMail']) {
             myMessage(item, msg);
         } else {
@@ -146,13 +234,14 @@
         writerArea.innerHTML = '';
     }
 
-    })
+    });
 
     socket.on('disconnected', (pseudoDc) => {
-        //connectedUser.innerHTML = "User is disconnected";
         console.log(pseudoDc);
-        connectedUser.innerHTML = pseudoDc + " is disconnected";
-    })
+        let item = document.createElement('li');
+        item.innerHTML = pseudoDc + " is disconnected";
+        messages.appendChild(item);
+    });
 
     login.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -163,40 +252,63 @@
             socketKey: socket['id'],
             online: true
         });
+        listGroup.style.display = "flex";
+        connexion.style.display = "none";
     });
 
-    socket.on('users', () => {
+    socket.on('draw old messages', (msg) =>{
 
-        socket.on('draw old messages', (msg) =>{
-            console.log(msg.length);
+        console.log("in draw old message ");
 
-            for ( let i = 0; i< msg.length;i++){
-                let item = document.createElement('li');
-                if (email.value === msg[i]['userMail']) {
-                    myMessage(item, msg[i]);
-                } else {
-                    otherMessage(item, msg[i]);
-                }
-                messages.appendChild(item);
-                window.scrollTo(0, document.body.scrollHeight);
+        for ( let i = 0; i< msg.length;i++){
+            console.log(msg[i]['group']);
+            let item = document.createElement('li');
+            if (email.value === msg[i]['userMail']) {
+                myMessage(item, msg[i]);
+            } else {
+                otherMessage(item, msg[i]);
             }
-        })
-    })
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        }console.log("");
+    });
+
+    socket.on('draw groups', (tabGroup) =>{
+        console.log(tabGroup);
+        for ( let i = 0; i< tabGroup.length;i++){
+            let item = document.createElement('li');
+            item.innerHTML = "<div id='"+tabGroup[i]["name"].toLowerCase()+"'><img class='image_user' id='"+tabGroup[i]["name"].toLowerCase()+"' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+                "<div ><h3 id='"+tabGroup[i]["name"].toLowerCase()+"'>" + tabGroup[i]["name"] + "</h3></div>"
+
+            item.id =  tabGroup[i]["name"].toLowerCase();
+            item.classList.add("room");
+            groups.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+
+        }
+        selectRoom();
+    });
 
     socket.on('connectedUsers', (users) => {
+        let item = document.createElement('li');
+        item.innerHTML = users['pseudo'] + " is connected.";
+        messages.appendChild(item);
+    });
 
-        connectedUser.innerHTML = users['pseudo'] + " is connected.";
-    })
-
-    input.addEventListener('input', () => {
+    inputMessage.addEventListener('input', () => {
         console.log("typing");
-        if (input.value !== '') {
+        if (inputMessage.value !== '') {
             console.log(pseudo.value);
             socket.emit('writingUsers', pseudo.value);
         } else {
             socket.emit('noWritingUsers', pseudo.value);
         }
-    })
+    });
+
+
+
+
+
 
 
 

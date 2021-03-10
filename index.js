@@ -2,12 +2,22 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-
 var users = [];
 var messages = [];
 var writers = [];
 var newUser=false;
-
+var groups = [
+    {
+        name : "General",
+        users: [],
+        img : ''
+    },
+    {
+        name : "group2",
+        users: [],
+        img : ''
+    }
+];
 var writerBool = true;
 var writerBool2 = false;
 
@@ -34,6 +44,7 @@ io.on('connection', (socket) => {
             if (user["email"] === users[i]["email"]){
                 users[i]["pseudo"] = user["pseudo"];
                 users[i]["socketKey"] = user["socketKey"];
+                users[i]["online"] = user["online"];
                 newUser=false;
             }
         }
@@ -41,13 +52,20 @@ io.on('connection', (socket) => {
             users.push(user);
         }
         socket.emit('users' ,users);
-        //console.log(messages);
-        socket.emit('draw old messages', messages)
+        socket.emit('draw groups', groups);
+
         //console.log(users);
 
         socket.broadcast.emit('connectedUsers', user);
         console.log(users);
 
+    });
+
+    socket.on('choice group', (group) =>{
+        console.log(messages);
+        let groupMessages = messages.filter(message => message["group"] === group);
+        console.log(groupMessages);
+        socket.emit('draw old messages', groupMessages);
     });
 
     socket.on('disconnect', () => {
