@@ -32,8 +32,9 @@ io.on('connection', (socket) => {
     socket.on('newUser', function (user) {
         //console.log(users);
         newUser=true;
+
         for(let i = 0;i<users.length;i++ ){
-            if (user["userMail"] === users[i]["userMail"]){
+            if (user["email"] === users[i]["email"]){
                 users[i]["pseudo"] = user["pseudo"];
                 users[i]["socketKey"] = user["socketKey"];
                 newUser=false;
