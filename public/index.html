@@ -124,7 +124,6 @@
 <div id="listGroup" style="display : none">
     <form id="searchGroup" action="">
         <input id="inputSearchGroup" autocomplete="off"/>
-        <button>search</button>
     </form>
     <ul id="groups">
     </ul>
@@ -167,6 +166,7 @@
     var groups = document.getElementById('groups');
     var titleRoom = document.getElementById('titleRoom');
     var currentGroup;
+    let inputSearchGroup = document.getElementById('inputSearchGroup');
 
     let formData = new FormData ();
     let emailData = formData.get("email");
@@ -303,6 +303,28 @@
 
         }
         selectRoom();
+
+        /*tabGroup.forEach(group => {
+            groups.innerHTML += "<div id='" + group["name"].toLowerCase() + "'><img class='image_user' id='" + group["name"].toLowerCase() + "' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+                "<div ><h3 id='" + group["name"].toLowerCase() + "'>" + group["name"] + "</h3></div>"
+        });*/
+
+        inputSearchGroup.addEventListener('input', () => {
+
+            let tmp = 0;
+            groups.innerHTML = "";
+            tabGroup.forEach (group => {
+                if (group['name'].toLowerCase().includes(inputSearchGroup.value)){
+                    tmp++;
+                    groups.innerHTML += "<div id='" + group["name"].toLowerCase() + "'><img class='image_user' id='" + group["name"].toLowerCase() + "' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+                        "<div ><h3 id='" + group["name"].toLowerCase() + "'>" + group["name"] + "</h3></div>"
+
+                }
+            })
+            if (tmp === 0){
+                groups.innerHTML = "<h4>Aucun résultat</h4>"
+            }
+        })
     });
 
     socket.on('participants', (users) => {
@@ -332,6 +354,8 @@
             socket.emit('noWritingUsers', pseudo.value);
         }
     });
+
+
 
 
 </script>
