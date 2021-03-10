@@ -28,13 +28,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('newUser', function (user) {
-        newUser=false;
+        console.log(users);
+        newUser=true;
         for(let i = 0;i<users.length;i++ ){
             if (user["userMail"] === users[i]["userMail"]){
                 users[i]["pseudo"] = user["pseudo"];
                 users[i]["socketKey"] = user["socketKey"];
-            }else {
-                newUser=true;
+                newUser=false;
             }
         }
         if (newUser){
