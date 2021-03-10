@@ -28,10 +28,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('newUser', function (user) {
-        console.log(users);
         newUser=true;
+
         for(let i = 0;i<users.length;i++ ){
-            if (user["userMail"] === users[i]["userMail"]){
+            if (user["email"] === users[i]["email"]){
                 users[i]["pseudo"] = user["pseudo"];
                 users[i]["socketKey"] = user["socketKey"];
                 newUser=false;
@@ -46,11 +46,12 @@ io.on('connection', (socket) => {
         //console.log(users);
 
         socket.broadcast.emit('connectedUsers', user);
-
+        console.log(users);
 
     });
 
     socket.on('disconnect', () => {
+        console.log(users);
         for (let i = 0; i<users.length; i++){
             if (socket['id'] === users[i]['socketKey']){
                 //console.log(users[i]['socketKey']);
@@ -59,6 +60,7 @@ io.on('connection', (socket) => {
                 io.emit('disconnected', users[i]['pseudo']);
 
             }
+
             if (users[i]['online']){
                 console.log(users[i]);
             }
