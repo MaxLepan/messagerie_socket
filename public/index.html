@@ -183,6 +183,7 @@
     }
 
     function selectRoom() {
+        console.log("on arrive là");
         document.querySelectorAll(".room").forEach(function (group) {
             group.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -304,27 +305,29 @@
         }
         selectRoom();
 
-        /*tabGroup.forEach(group => {
-            groups.innerHTML += "<div id='" + group["name"].toLowerCase() + "'><img class='image_user' id='" + group["name"].toLowerCase() + "' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
-                "<div ><h3 id='" + group["name"].toLowerCase() + "'>" + group["name"] + "</h3></div>"
-        });*/
-
         inputSearchGroup.addEventListener('input', () => {
-
             let tmp = 0;
             groups.innerHTML = "";
             tabGroup.forEach (group => {
+
                 if (group['name'].toLowerCase().includes(inputSearchGroup.value)){
                     tmp++;
-                    groups.innerHTML += "<div id='" + group["name"].toLowerCase() + "'><img class='image_user' id='" + group["name"].toLowerCase() + "' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+                    let item = document.createElement('li');
+                    item.innerHTML += "<div id='" + group["name"].toLowerCase() + "'><img class='image_user' id='" + group["name"].toLowerCase() + "' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
                         "<div ><h3 id='" + group["name"].toLowerCase() + "'>" + group["name"] + "</h3></div>"
-
+                    item.id = group["name"].toLowerCase();
+                    item.classList.add("room");
+                    groups.appendChild(item);
+                    window.scrollTo(0, document.body.scrollHeight);
                 }
+
             })
             if (tmp === 0){
                 groups.innerHTML = "<h4>Aucun résultat</h4>"
             }
+            selectRoom();
         })
+
     });
 
     socket.on('participants', (users) => {
