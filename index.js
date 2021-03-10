@@ -2,13 +2,23 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-
 var users = [];
 var messages = [];
 var writers = [];
 var connectedUsers = [];
 var newUser=false;
-
+var groups = [
+    {
+        name : "General",
+        users: [],
+        img : ''
+    },
+    {
+        name : "group2",
+        users: [],
+        img : ''
+    }
+];
 var writerBool = true;
 var writerBool2 = false;
 
@@ -36,6 +46,7 @@ io.on('connection', (socket) => {
             if (user["email"] === users[i]["email"]){
                 users[i]["pseudo"] = user["pseudo"];
                 users[i]["socketKey"] = user["socketKey"];
+                users[i]["online"] = user["online"];
                 newUser=false;
             }
         }
@@ -44,13 +55,20 @@ io.on('connection', (socket) => {
             connectedUsers.push(user);
         }
         socket.emit('users' ,users);
+        socket.emit('draw groups', groups);
         io.emit('participants', connectedUsers);
-        socket.emit('draw old messages', messages)
-        console.log(users);
+        //console.log(users);
 
         socket.broadcast.emit('connectedUsers', user);
+        console.log(users);
 
+    });
 
+    socket.on('choice group', (group) =>{
+        console.log(messages);
+        let groupMessages = messages.filter(message => message["group"] === group);
+        console.log(groupMessages);
+        socket.emit('draw old messages', groupMessages);
     });
 
     socket.on('disconnect', () => {
@@ -62,16 +80,17 @@ io.on('connection', (socket) => {
         io.emit('participants', connectedUsers);
 
         for (let i = 0; i<users.length; i++){
-
             if (socket['id'] === users[i]['socketKey']){
-
+                //console.log(users[i]['socketKey']);
+                //console.log(socket['id']);
                 users[i]['online'] = false;
-                io.emit('disconnected', users[i]);
+                io.emit('disconnected', users[i]['pseudo']);
 
-
-                console.log(users);
             }
 
+            if (users[i]['online']){
+                console.log(users[i]);
+            }
         }
 
     });
