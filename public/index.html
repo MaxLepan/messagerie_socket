@@ -72,8 +72,13 @@
 <div id="connectedUser"></div>
 
 <ul id="messages"></ul>
-<div>
 
+<div>
+    <h4>Online users</h4>
+    <ul id="onlineUsers"></ul>
+</div>
+
+<div>
     <div id="writerArea"></div>
 <form id="message" action="">
     <input id="input" autocomplete="off" /><button>Send</button>
@@ -92,6 +97,7 @@
     var email = document.getElementById('email');
     var writerArea = document.getElementById('writerArea');
     var connectedUser = document.getElementById('connectedUser');
+    let onlineUsers = document.getElementById('onlineUsers');
 
     function myMessage(item, msg) {
         item.innerHTML =
@@ -139,7 +145,6 @@
                 writerArea.innerHTML += writers[i] + ", ";
             }
 
-            //console.log(writers);
         }
         writerArea.innerHTML += " is typing.</div>";
     } else {
@@ -148,10 +153,9 @@
 
     })
 
-    socket.on('disconnected', (pseudoDc) => {
-        //connectedUser.innerHTML = "User is disconnected";
-        console.log(pseudoDc);
-        connectedUser.innerHTML = pseudoDc + " is disconnected";
+    socket.on('disconnected', (user) => {
+        connectedUser.innerHTML = user['pseudo'] + " is disconnected";
+
     })
 
     login.addEventListener('submit', function(e) {
@@ -181,11 +185,27 @@
                 window.scrollTo(0, document.body.scrollHeight);
             }
         })
+
+    })
+
+    socket.on('participants', (users) => {
+        let connectedUsers = onlineUsers;
+        connectedUsers.innerHTML = "";
+
+        users.forEach(user => {
+            connectedUsers.innerHTML += `
+            <li> <div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>
+            <p>${user.pseudo}</p>
+            </li>`
+        })
     })
 
     socket.on('connectedUsers', (users) => {
 
         connectedUser.innerHTML = users['pseudo'] + " is connected.";
+
+        console.log(users);
+
     })
 
     input.addEventListener('input', () => {
