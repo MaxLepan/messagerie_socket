@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
         socket.emit('users' ,users);
         //console.log(messages);
         socket.emit('draw old messages', messages)
-        //console.log(users);
+        console.log(users);
 
         socket.broadcast.emit('connectedUsers', user);
 
@@ -51,7 +51,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
+        console.log(users);
         for (let i = 0; i<users.length; i++){
+
             if (socket['id'] === users[i]['socketKey']){
                 //console.log(users[i]['socketKey']);
                 //console.log(socket['id']);
@@ -59,9 +61,9 @@ io.on('connection', (socket) => {
                 io.emit('disconnected', users[i]['pseudo']);
 
             }
-            if (users[i]['online']){
-                console.log(users[i]);
-            }
+            //if (users[i][]){
+
+            //}
         }
 
     });

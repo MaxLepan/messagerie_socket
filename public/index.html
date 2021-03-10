@@ -139,7 +139,7 @@
                 writerArea.innerHTML += writers[i] + ", ";
             }
 
-            console.log(writers);
+            //console.log(writers);
         }
         writerArea.innerHTML += " is typing.</div>";
     } else {
@@ -168,7 +168,7 @@
     socket.on('users', () => {
 
         socket.on('draw old messages', (msg) =>{
-            console.log(msg.length);
+            //console.log(msg.length);
 
             for ( let i = 0; i< msg.length;i++){
                 let item = document.createElement('li');
