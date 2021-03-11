@@ -112,14 +112,20 @@ socket.on('chat message', function (msg) {
 
 socket.on('writingUsers', (writers) => {
     if (writers.length !== 0) {
-        writerArea.innerHTML = "<div id ='textWriterArea'>&nbsp;"
+        writerArea.innerHTML = "<div id ='textWriterArea'>"
+        var drawArea = true;
         for (let i = 0; i < writers.length; i++) {
             if (writers[i] !== pseudo.value) {
                 writerArea.innerHTML += writers[i] + ", ";
+                drawArea = false;
             }
 
         }
+
         writerArea.innerHTML += " is typing... &nbsp;</div>";
+        if (!drawArea){
+            writerArea.innerHTML = '';
+        }
     } else {
         writerArea.innerHTML = '';
     }
@@ -282,8 +288,7 @@ inputMessage.addEventListener('input', () => {
 
 settingsIcon.addEventListener('click', () => {
     settings.innerHTML+='<div>' +
-        '<div>general settings</div>' +
-        '<div>group settings</div>' +
+        '<div>Users list </div>' +
         '</div>';
 });
 
