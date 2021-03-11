@@ -239,7 +239,7 @@ socket.on('participants', (users) => {
     let usersOnline = users.filter(user => user["online"] === true);
     let usersOffline = users.filter(user => user["online"] === false);
     let item = document.createElement('li');
-    item.innerHTML = "<h4>Online users</h4>";
+    item.innerHTML = "<h3>Online users</h3>";
     onlineUsers.appendChild(item);
     for (let i = 0; i < usersOnline.length; i++) {
         let item = document.createElement('li');
@@ -250,7 +250,7 @@ socket.on('participants', (users) => {
     }
 
     item = document.createElement('li');
-    item.innerHTML = "<h4>Offline users</h4>";
+    item.innerHTML = "<h3>Offline users</h3>";
     onlineUsers.appendChild(item);
     for (let i = 0; i < usersOffline.length; i++) {
         let item = document.createElement('li');
@@ -287,9 +287,7 @@ inputMessage.addEventListener('input', () => {
 });
 
 settingsIcon.addEventListener('click', () => {
-    settings.innerHTML+='<div>' +
-        '<div>Users list </div>' +
-        '</div>';
+    settings.style.display = "flex";
 });
 
 addIcon.addEventListener('click', () => {

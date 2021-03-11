@@ -262,11 +262,29 @@ body {
 }
 
 #settings{
-    z-index: 5;
     position: fixed;
+    z-index: 6;
+    background: white;
+    flex-direction: column;
+    width: 70vw;
+    height: 100vh;
+    align-items: center;
+    justify-content: flex-start;
+    right: 0;
+
+}
+#titleSetting{
+    margin: 50px;
+}
+#onlineUsers{
+    width: calc(100% - 40px);
+    padding: 20px;
+    list-style-type: none;
 }
 
 #settingsIcon{
+    top: 0;
+    z-index: 5;
     right: 0;
     position: fixed;
     margin: 15px;
