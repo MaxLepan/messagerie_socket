@@ -32,6 +32,7 @@ function myMessage(item, msg) {
         "<div class ='meSender'><h3>" + msg["user"] + "</h3></div>" +
         "<div class ='mySend'>" + msg["message"] + "</div>" +
         "</div>" +
+        "<div><i class='las la-thumbtack la-thumbtack-me'></i></div>" +
         "<div><img class='image_user' src='"+msg["userImg"]+"'></div>";
 }
 
@@ -75,6 +76,7 @@ function otherMessage(item, msg) {
         "<div>" +
         "<div class = 'otherSender'><h3>" + msg["user"] + "</h3></div>" +
         "<div class = 'otherSend'>" + msg["message"] + "</div>" +
+        "<div><i class='las la-thumbtack la-thumbtack-other '></i></div>" +
         "</div>";
 
 };
