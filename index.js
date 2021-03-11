@@ -1,7 +1,14 @@
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const io = require("socket.io")(http, {
+    cors: {
+        origin: "https://messageriesnap.herokuapp.com/",
+        methods: ["GET", "POST"]
+    }
+});
+const port = process.env.PORT || 3000;
+
 var users = [];
 var messages = [];
 var writers = [];
@@ -116,7 +123,7 @@ io.on('connection', (socket) => {
             writers.push(writerAndGroup["writer"]);
         }
 
-        socket.to(writerAndGroup["group"]).emit('writingUsers', writers);
+        io.to(writerAndGroup["group"]).emit('writingUsers', writers);
     })
 
     socket.on('noWritingUsers', (writerAndGroup) => {
@@ -131,13 +138,13 @@ io.on('connection', (socket) => {
 
         }
 
-        socket.to(writerAndGroup["group"]).emit('writingUsers', writers);
+        io.to(writerAndGroup["group"]).emit('writingUsers', writers);
     })
 
 
 });
 
-http.listen(3000, () => {
-    console.log('listening on *:3000');
+http.listen(port, () => {
+    console.log(`Socket.IO server running at http://localhost:${port}`);
 });
 

@@ -17,5 +17,5 @@
   "engines": {
     "node": "14.16.0"
   },
-  "keywords": []
+  "keywords": ["heroku"]
 }

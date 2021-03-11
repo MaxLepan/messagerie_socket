@@ -1,5 +1,5 @@
 var listGroup = document.getElementById("listGroup");
-var socket = io("ws://localhost:3000");
+var socket = io();
 var message = document.getElementById('drawMessage');
 var messages = document.getElementById('messages');
 var inputMessage = document.getElementById('inputMessage');
