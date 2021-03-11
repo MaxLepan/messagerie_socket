@@ -367,10 +367,9 @@
     var settings = document.getElementById('settings');
     var currentGroup;
     let inputSearchGroup = document.getElementById('inputSearchGroup');
+    let hash = md5(email.value);
 
-    let formData = new FormData();
-    let emailData = formData.get("email");
-    let hash = md5(emailData);
+
 
 
 
@@ -379,7 +378,7 @@
             "<div class ='meSender'><h3>" + msg["user"] + "</h3></div>" +
             "<div class ='mySend'>" + msg["message"] + "</div>" +
             "</div>" +
-            "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>";
+            "<div><img class='image_user' src='"+msg["userImg"]+"'></div>";
     }
 
     function selectRoom() {
@@ -403,7 +402,7 @@
     };
 
     function otherMessage(item, msg) {
-        item.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
+        item.innerHTML = "<div><img class='image_user' src='"+msg["userImg"]+"'></div>" +
             "<div>" +
             "<div class = 'otherSender'><h3>" + msg["user"] + "</h3></div>" +
             "<div class = 'otherSend'>" + msg["message"] + "</div>" +
@@ -418,6 +417,7 @@
                 message: inputMessage.value,
                 userMail: email.value,
                 user: pseudo.value,
+                userImg : 'https://www.gravatar.com/avatar/' + hash,
                 group: currentGroup
             });
             inputMessage.value = '';
@@ -471,10 +471,11 @@
 
     login.addEventListener('submit', function (e) {
         e.preventDefault();
+        hash = md5(email.value);
         socket.emit('newUser', {
             pseudo: pseudo.value,
             email: email.value,
-            img: '',
+            img: 'https://www.gravatar.com/avatar/' + hash ,
             socketKey: socket['id'],
             online: true
         });
@@ -586,6 +587,7 @@
             "<div class='textConnect'>   "+users['pseudo'] + " is connected.   </div>" +
             " <div class='lineConnect'> </div>";
         item.classList.add("messageConnect");
+
         messages.appendChild(item);
         messages.scrollTop = messages.scrollHeight;
     });
@@ -598,6 +600,8 @@
         } else {
             socket.emit('noWritingUsers', {writer: pseudo.value, group: currentGroup});
         }
+        console.log(email.value);
+        console.log(hash);
     });
 
     settingsIcon.addEventListener('click', () => {
