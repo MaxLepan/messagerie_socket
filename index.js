@@ -110,7 +110,7 @@ io.on('connection', (socket) => {
             users.push(user);
         }
         socket.emit('users', users);
-        io.emit('draw groups', groups);
+        socket.emit('draw groups', groups);
         io.emit('participants', users);
         //console.log(users);
 
