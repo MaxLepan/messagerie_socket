@@ -112,6 +112,9 @@ io.on('connection', (socket) => {
         console.log(users);
 
     });
+    socket.on('quit group', (group) => {
+        socket.leave(group);
+    });
 
     socket.on('choice group', (group) => {
         socket.join(group);

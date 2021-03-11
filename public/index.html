@@ -390,6 +390,10 @@
                 console.log("name room");
                 console.log(e.target.id);
                 console.log("");
+                if (currentGroup){
+                    socket.emit('quit group', currentGroup);
+                }
+
                 currentGroup = e.target.id;
                 socket.emit('choice group', currentGroup);
                 discussion.style.display = "flex";
