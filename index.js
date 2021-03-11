@@ -7,12 +7,11 @@ const io = require("socket.io")(http, {
         methods: ["GET", "POST"]
     }
 });
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 var users = [];
 var messages = [];
 var writers = [];
-var connectedUsers = [];
 var newUser = false;
 var groups = [
     {
