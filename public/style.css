@@ -1,0 +1,285 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+#connexion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+}
+
+#connectionArea {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 350px;
+    width: 350px;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.56);
+}
+
+#login {
+    display: flex;
+    height: 50%;
+    width: 90%;
+    align-items: stretch;
+    justify-content: space-around;
+    flex-direction: column;
+}
+
+.labelAndInput {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.input {
+    padding: 2px 5px;
+    width: 95%;
+}
+
+#buttonLogin {
+    background: #9fcbf5;
+    border: none;
+    border-radius: 10px;
+    height: 20px;
+    width: 40%;
+    margin: 0 30%;
+    outline: none;
+}
+
+
+#listGroup {
+    padding-top: 70px;
+    display: flex;
+    z-index: 3;
+    position: fixed;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30vw;
+    height: calc(100vh - 70px);
+    background: #333333;
+}
+
+#searchGroup {
+    margin: 10px;
+}
+
+
+#discussion {
+    margin-left: 30vw;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 70vw;
+    height: 100vh;
+}
+
+#myAccount {
+    color: #ffffff;
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    height: 70px;
+    z-index: 4;
+    align-items: center;
+}
+
+.room {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-top: 1px #3e3e3e solid;
+
+}
+
+.nameRoom {
+    color: #ffffff;
+    width: calc(30vw - 80px);
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+
+}
+
+#noResult {
+    width: 100%;
+    text-align: center;
+}
+
+#inputSearchGroup {
+    border: none;
+    padding: 5px 10px;
+    flex-grow: 1;
+    border-radius: 2rem;
+}
+
+#inputSearchGroup:focus {
+    outline: none;
+}
+
+#groups {
+    list-style-type: none;
+    height: calc(100vh - 120px);
+    margin: 0;
+    padding: 0;
+    overflow-y: scroll;
+
+}
+
+#groups::-webkit-scrollbar {
+    width: 0 !important
+}
+
+#drawMessage {
+    background: #9a9a9a;
+    padding: 5px;
+    display: flex;
+    height: 50px;
+}
+
+#inputMessage {
+    border: none;
+    padding: 0 1rem;
+    flex-grow: 1;
+    border-radius: 2rem;
+    margin: 0.25rem;
+}
+
+#inputMessage:focus {
+    outline: none;
+}
+
+#drawMessage > button {
+    background: #333;
+    border: none;
+    padding: 0 1rem;
+    margin: 0.25rem;
+    border-radius: 3px;
+    outline: none;
+    color: #fff;
+}
+
+#messages {
+    list-style-type: none;
+    overflow-y: scroll;
+    height: calc(100vh - 130px);
+    margin-bottom: 0;
+    padding: 20px 10px 0 0;
+}
+
+#messages::-webkit-scrollbar {
+    width: 0 !important
+}
+
+.myMessage {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-left: 20px;
+
+}
+
+.otherMessage {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding-right: 20px;
+}
+
+.meSender {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.otherSender {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.mySend {
+    background: #9fcbf5;
+    border-radius: 10px;
+    padding: 5px 10px;
+    -moz-border-radius-topright: 0;
+
+
+}
+
+.otherSend {
+    background: #ededed;
+    border-radius: 10px;
+    padding: 5px 10px;
+    -moz-border-radius-topleft: 0;
+}
+
+#titleRoom {
+    z-index: 2;
+    display: flex;
+    height: 80px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    background: #333333;
+    color: white;
+    box-shadow: 0px 0px 11px 5px rgba(0, 0, 0, 0.59);
+
+}
+
+.image_user {
+    width: 50px;
+    height: 50px;
+    margin: 10px;
+    border-radius: 50%;
+}
+
+#settings{
+    z-index: 5;
+    position: fixed;
+}
+#settingsIcon{
+    right: 0;
+    position: fixed;
+    margin: 15px;
+    z-index: 5;
+    align-items: stretch;
+    justify-content: stretch;
+    width: 40px;
+    height: 30px;
+
+}
+.fa-cog{
+    color: white;
+    font-size: 30px;
+}
+.messageConnect{
+    width: 70vw ;
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.lineConnect{
+    border-top: #9a9a9a 2px dotted;
+    height: 1px;
+    width: calc((70vw - 230px) /2);
+
+}
+.textConnect{
+    color: #9a9a9a;
+
+
+}
