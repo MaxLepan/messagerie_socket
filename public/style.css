@@ -27,7 +27,7 @@ body {
     flex-direction: column;
     height: 350px;
     width: 350px;
-    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.56);
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.56);
 }
 
 #login {
@@ -58,6 +58,10 @@ body {
     width: 40%;
     margin: 0 30%;
     outline: none;
+}
+
+#buttonLogin:hover {
+    cursor: pointer;
 }
 
 
@@ -99,12 +103,19 @@ body {
     align-items: center;
 }
 
+#myAccount:hover {
+    cursor: pointer;
+}
+
 .room {
     display: flex;
     flex-direction: row;
     align-items: center;
     border-top: 1px #3e3e3e solid;
+}
 
+.room:hover {
+    cursor: pointer;
 }
 
 .nameRoom {
@@ -237,7 +248,7 @@ body {
     justify-content: center;
     background: #333333;
     color: white;
-    box-shadow: 0px 0px 11px 5px rgba(0, 0, 0, 0.59);
+    box-shadow: 0 0 11px 5px rgba(0, 0, 0, 0.59);
 
 }
 
@@ -252,6 +263,7 @@ body {
     z-index: 5;
     position: fixed;
 }
+
 #settingsIcon{
     right: 0;
     position: fixed;
@@ -263,6 +275,12 @@ body {
     height: 40px;
 
 }
+
+#settingsIcon:hover {
+    cursor: pointer;
+}
+
+
 .fa-cog{
     color: white;
     font-size: 30px;
@@ -275,6 +293,10 @@ body {
     width: 25px;
     height: 25px;
 
+}
+
+#addGroupIcon:hover {
+    cursor: pointer;
 }
 
 .fa-plus{
@@ -310,4 +332,50 @@ body {
 }
 #textWriterArea{
     margin: 3px 5px;
+}
+
+.myMessage:hover, .otherMessage:hover {
+    background: #dedede;
+}
+
+#userSettings {
+    position: fixed;
+    background: #3e3e3e;
+    color: white;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+
+    text-align: center;
+
+    z-index: 10;
+}
+
+#settingsImgContainer {
+    position: relative;
+    width: 50vw;
+    left: 25vw;
+
+    border-radius: 50%;
+}
+
+#settingImg {
+    width: 100%;
+    object-fit: contain;
+}
+
+#quitUserSettings {
+    position: absolute;
+
+}
+
+#quitUserSettings:hover {
+    cursor: pointer;
+    object-fit: contain;
+}
+
+a {
+    color: white;
+    text-decoration: none;
 }
