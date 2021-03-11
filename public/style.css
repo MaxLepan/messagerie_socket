@@ -211,7 +211,7 @@ body {
 
 .mySend {
     background: #9fcbf5;
-    border-radius: 10px;
+    border-radius: 10px 0 10px 10px;
     padding: 5px 10px;
     -moz-border-radius-topright: 0;
 
@@ -220,7 +220,7 @@ body {
 
 .otherSend {
     background: #ededed;
-    border-radius: 10px;
+    border-radius:0 10px 10px 10px;
     padding: 5px 10px;
     -moz-border-radius-topleft: 0;
 }
@@ -282,4 +282,14 @@ body {
     color: #9a9a9a;
 
 
+}
+#writerArea{
+    position: fixed;
+    margin-top: -26px;
+    height: 26px;
+    color: #3e3e3e;
+    background: rgb(191, 233, 255);
+}
+#textWriterArea{
+    margin: 3px 5px;
 }

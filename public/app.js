@@ -93,14 +93,14 @@ socket.on('chat message', function (msg) {
 
 socket.on('writingUsers', (writers) => {
     if (writers.length !== 0) {
-        writerArea.innerHTML = "<div>"
+        writerArea.innerHTML = "<div id ='textWriterArea'>&nbsp;"
         for (let i = 0; i < writers.length; i++) {
             if (writers[i] !== pseudo.value) {
                 writerArea.innerHTML += writers[i] + ", ";
             }
 
         }
-        writerArea.innerHTML += " is typing.</div>";
+        writerArea.innerHTML += " is typing... &nbsp;</div>";
     } else {
         writerArea.innerHTML = '';
     }
