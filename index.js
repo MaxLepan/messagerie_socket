@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const port = process.env.PORT || 3000;
+
 var users = [];
 var messages = [];
 var writers = [];
@@ -175,7 +177,7 @@ io.on('connection', (socket) => {
 
 });
 
-http.listen(3000, () => {
-    console.log('listening on *:3000');
+http.listen(port, () => {
+    console.log(`Socket.IO server running at http://localhost:${port}`);
 });
 
