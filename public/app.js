@@ -184,6 +184,7 @@ socket.on('draw old messages', (msg) => {
 
 socket.on('draw groups', (tabGroup) => {
     console.log(tabGroup);
+    groups.innerHTML= "";
     for (let i = 0; i < tabGroup.length; i++) {
         let item = document.createElement('li');
         item.innerHTML = "<div id='" + tabGroup[i]["name"].toLowerCase() + "'>" +
