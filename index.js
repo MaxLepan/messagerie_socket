@@ -135,7 +135,7 @@ io.on('connection', (socket) => {
             writers.push(writerAndGroup["writer"]);
         }
 
-        io.to(writerAndGroup["group"]).emit('writingUsers', writers);
+        socket.to(writerAndGroup["group"]).emit('writingUsers', writers);
     })
 
     socket.on('noWritingUsers', (writerAndGroup) => {
@@ -150,7 +150,7 @@ io.on('connection', (socket) => {
 
         }
 
-        io.to(writerAndGroup["group"]).emit('writingUsers', writers);
+        socket.to(writerAndGroup["group"]).emit('writingUsers', writers);
     })
 
 
