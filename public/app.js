@@ -14,6 +14,7 @@ var connexion = document.getElementById('connexion');
 var groups = document.getElementById('groups');
 var titleRoom = document.getElementById('titleRoom');
 var settingsIcon = document.getElementById('settingsIcon');
+var addIcon = document.getElementById("addIcon")
 var settings = document.getElementById('settings');
 var currentGroup;
 let inputSearchGroup = document.getElementById('inputSearchGroup');
@@ -31,22 +32,37 @@ function myMessage(item, msg) {
         "<div><img class='image_user' src='"+msg["userImg"]+"'></div>";
 }
 
+function drawRoom(currentGroup){
+    messages.innerHTML = "";
+
+    console.log("name room");
+    console.log("");
+    if (currentGroup){
+        socket.emit('quit group', currentGroup);
+    }
+
+
+
+    socket.emit('choice group', currentGroup);
+    discussion.style.display = "flex";
+    titleRoom.innerHTML = "<h1>" + currentGroup + "</h1>";
+}
+
 function selectRoom() {
-    document.querySelectorAll(".room").forEach(function (group) {
+    document.querySelectorAll(".room, #addIcon").forEach(function (group) {
         group.addEventListener('click', (e) => {
-            messages.innerHTML = "";
             e.preventDefault();
-            console.log("name room");
-            console.log(e.target.id);
-            console.log("");
-            if (currentGroup){
-                socket.emit('quit group', currentGroup);
+            if (e.target.id === "addIcon" && inputSearchGroup.value){
+                currentGroup = inputSearchGroup.value
+                inputSearchGroup.value ="";
+                drawRoom(currentGroup)
+            }else if (e.target.id !== "addIcon") {
+                currentGroup = e.target.id;
+                drawRoom(currentGroup)
+
+
             }
 
-            currentGroup = e.target.id;
-            socket.emit('choice group', currentGroup);
-            discussion.style.display = "flex";
-            titleRoom.innerHTML = "<h1>" + currentGroup + "</h1>";
         })
     });
 };
@@ -202,6 +218,12 @@ socket.on('draw groups', (tabGroup) => {
 
 });
 
+socket.on("select Room with add", () =>{
+    console.log("selectRoom")
+    selectRoom();
+})
+
+
 socket.on('participants', (users) => {
     onlineUsers.innerHTML = "";
     let usersOnline = users.filter(user => user["online"] === true);
@@ -216,7 +238,7 @@ socket.on('participants', (users) => {
         onlineUsers.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     }
-    ;
+
     item = document.createElement('li');
     item.innerHTML = "<h4>Offline users</h4>";
     onlineUsers.appendChild(item);
@@ -227,7 +249,7 @@ socket.on('participants', (users) => {
         onlineUsers.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     }
-    ;
+
 
 })
 
@@ -259,4 +281,11 @@ settingsIcon.addEventListener('click', () => {
         '<div>general settings</div>' +
         '<div>group settings</div>' +
         '</div>';
+});
+
+addIcon.addEventListener('click', () => {
+    socket.emit("newGroup", {
+        name : inputSearchGroup.value,
+        users: [email.value]
+    });
 });

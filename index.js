@@ -5,68 +5,12 @@ const io = require('socket.io')(http);
 var users = [];
 var messages = [];
 var writers = [];
-var connectedUsers = [];
-var newUser = false;
+var newUser;
+var newGroup;
 var groups = [
     {
-        name: "General",
+        name: "general",
         users: [],
-        img: ''
-    },
-    {
-        name: "group2",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group3",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group4",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group5",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group6",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group7",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group8",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group9",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group10",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group11",
-        users: [],
-        img: ''
-    },
-    {
-        name: "group12gfdsn gsdfnfnfgnb yjj rthjeyjeyjyk ry-yhryejhryehjryzjytrj rfysthr-yjhfdgnfd",
-        users: [],
-        img: ''
     }
 
 ];
@@ -85,6 +29,24 @@ io.on('connection', (socket) => {
     socket.on('chat message', (msg) => {
         io.in(msg["group"]).emit('chat message', msg);
         messages.push(msg);
+
+    });
+
+    socket.on('newGroup', group=> {
+
+        newGroup = true;
+
+        for (let i = 0; i < groups.length; i++) {
+            if (group["name"] === groups[i]["name"]) {
+                newGroup = false;
+            }
+        }
+        if (newGroup) {
+            console.log("add room")
+            groups.push(group);
+        }
+        socket.emit('select Room with add',group);
+        socket.emit('draw groups', groups);
 
     });
 
