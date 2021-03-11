@@ -5,12 +5,12 @@ Nous avons créé une messagerie instantanée et éphémère en ligne, hébergé
 
 Ce site est disponible sur [ce lien](https://messageriesnap.herokuapp.com/ "Messagerie SNAP.").
 
-### Connection
+## Connection
 
 On commence par entrer un pseudo et un email.
 Ils seront sauvegardés sur le serveur tant que celui ci n'est pas redémarré.
 
-### Menu principal
+## Menu principal
 
 Si votre adresse email est liée à un compte Gravatar, votre photo de profil sera celle que vous avez mise sur ce compte, sinon, c'est l'image de base de Gravatar qui sera votre photo de profil.
 
