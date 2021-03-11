@@ -3,7 +3,7 @@
 
 Nous avons créé une messagerie instantanée et éphémère en ligne, hébergée sur Heroku, pendant une semaine dans le cadre d'un workshop.
 
-Ce site est disponible sur [ce lien]"https://messageriesnap.herokuapp.com/ (Messagerie SNAP.)".
+Ce site est disponible sur [ce lien](https://messageriesnap.herokuapp.com/ "Messagerie SNAP.").
 
 ### Connection
 
