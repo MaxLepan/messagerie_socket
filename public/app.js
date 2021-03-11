@@ -19,6 +19,9 @@ var settings = document.getElementById('settings');
 var currentGroup;
 let inputSearchGroup = document.getElementById('inputSearchGroup');
 let hash = md5(email.value);
+let userAccount = document.getElementById('myAccount');
+let userSettings = document.getElementById('userSettings');
+let quitUserSettings;
 
 
 
@@ -289,3 +292,31 @@ addIcon.addEventListener('click', () => {
         users: [email.value]
     });
 });
+
+userAccount.addEventListener('click', () => {
+    console.log("user settings click");
+    userSettings.style.display = 'block';
+    userSettings.innerHTML = `
+    <div id="quitUserSettings">
+        <i class="las la-angle-left"></i>
+    </div>
+    <div id="settingsImgContainer">
+        <a target="_blank" rel="noopener noreferrer" href="https://fr.gravatar.com/">
+            <img title="Changer de photo de profil" id="settingImg" src="https://www.gravatar.com/avatar/${hash}">
+        </a>
+    </div>
+<div>
+    <h2>${pseudo.value}</h2>
+    <h3>${email.value}</h3>
+    
+    
+</div>`
+
+    quitUserSettings = document.getElementById('quitUserSettings');
+
+    quitUserSettings.addEventListener('click', () => {
+
+        userSettings.style.display = 'none';
+    })
+})
+
