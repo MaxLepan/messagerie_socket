@@ -39,27 +39,33 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on('newGroup', group=> {
+    socket.on('newGroup', group => {
 
         newGroup = true;
 
         for (let i = 0; i < groups.length; i++) {
             if (group["name"] === groups[i]["name"]) {
                 newGroup = false;
-            }
+                groups[i]["users"].push(users.find(user => socket['id'] === user['socketKey'])["email"])
+                console.log(groups[i]['users']);
+
+            }console.log(groups[i]);
         }
+
+
         if (newGroup) {
             console.log("add room")
             groups.push(group);
         }
-        socket.emit('select Room with add',group);
-        socket.emit('draw groups', groups);
+        socket.emit('select Room with add', group);
+        socket.emit('draw groups', groups)
 
     });
 
     socket.on('newUser', function (user) {
 
         newUser = true;
+        groups[0]["users"].push(user["email"]);
 
         for (let i = 0; i < users.length; i++) {
             if (user["email"] === users[i]["email"]) {
@@ -76,19 +82,25 @@ io.on('connection', (socket) => {
         socket.emit('draw groups', groups);
         io.emit('participants', users);
         //console.log(users);
-
         socket.broadcast.emit('connectedUsers', user);
         console.log(users);
 
     });
+
+
     socket.on('quit group', (group) => {
         socket.leave(group);
     });
 
     socket.on('choice group', (group) => {
         socket.join(group);
+        console.log(groups.findIndex((room) =>room["name"]===group) );
+        if (groups[groups.findIndex((room) =>room["name"]===group)]["users"]===users.find(user => socket['id'] === user['socketKey'])["email"]){
+            groups[groups.findIndex((room) =>room["name"]===group)]["users"].push(users.find(user => socket['id'] === user['socketKey'])["email"])
+        }
+
         let groupMessages = messages.filter(message => message["group"] === group);
-        console.log(groupMessages);
+        console.log(groups)
         socket.emit('draw old messages', groupMessages);
     });
 
