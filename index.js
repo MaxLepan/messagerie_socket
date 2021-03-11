@@ -17,7 +17,58 @@ var groups = [
         name: "group2",
         users: [],
         img: ''
+    },
+    {
+        name: "group3",
+        users: [],
+        img: ''
+    },
+    {
+        name: "group4",
+        users: [],
+        img: ''
+    },
+    {
+        name: "group5",
+        users: [],
+        img: ''
+    },
+    {
+        name: "group6",
+        users: [],
+        img: ''
+    },
+    {
+        name: "group7",
+        users: [],
+        img: ''
+    },
+    {
+        name: "group8",
+        users: [],
+        img: ''
+    },
+    {
+        name: "group9",
+        users: [],
+        img: ''
+    },
+    {
+        name: "group10",
+        users: [],
+        img: ''
+    },
+    {
+        name: "group11",
+        users: [],
+        img: ''
+    },
+    {
+        name: "group12gfdsn gsdfnfnfgnb yjj rthjeyjeyjyk ry-yhryejhryehjryzjytrj rfysthr-yjhfdgnfd",
+        users: [],
+        img: ''
     }
+
 ];
 var writerBool = true;
 var writerBool2 = false;
@@ -32,7 +83,7 @@ io.on('connection', (socket) => {
 
 
     socket.on('chat message', (msg) => {
-        io.emit('chat message', msg);
+        io.in(msg["group"]).emit('chat message', msg);
         messages.push(msg);
 
     });
@@ -63,7 +114,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('choice group', (group) => {
-        console.log(messages);
+        socket.join(group);
         let groupMessages = messages.filter(message => message["group"] === group);
         console.log(groupMessages);
         socket.emit('draw old messages', groupMessages);
@@ -89,33 +140,33 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on('writingUsers', (writer) => {
+    socket.on('writingUsers', (writerAndGroup) => {
         writerBool = true;
         for (let i = 0; i < writers.length; i++) {
-            if (writers[i] === writer) {
+            if (writers[i] === writerAndGroup["writer"]) {
                 writerBool = false;
             }
         }
         if (writerBool) {
-            writers.push(writer);
+            writers.push(writerAndGroup["writer"]);
         }
 
-        socket.broadcast.emit('writingUsers', writers);
+        socket.to(writerAndGroup["group"]).emit('writingUsers', writers);
     })
 
-    socket.on('noWritingUsers', (writer) => {
+    socket.on('noWritingUsers', (writerAndGroup) => {
         writerBool2 = false;
         for (var i = 0; i < writers.length; i++) {
-            if (writers[i] === writer) {
+            if (writers[i] === writerAndGroup["writer"]) {
                 writerBool2 = true;
             }
         }
         if (writerBool2) {
-            writers.splice(writer, 1);
+            writers.splice(writerAndGroup["writer"], 1);
 
         }
 
-        socket.broadcast.emit('writingUsers', writers);
+        socket.to(writerAndGroup["group"]).emit('writingUsers', writers);
     })
 
 

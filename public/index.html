@@ -1,78 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
     <title>Socket.IO chat</title>
     <style>
-        body {
+        * {
             margin: 0;
-            padding-bottom: 3rem;
+            padding: 0;
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        #listGroup {
+        #connexion {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #connectionArea {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 350px;
+            width: 350px;
+            box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.56);
+        }
+
+        #login {
+            display: flex;
+            height: 50%;
+            width: 90%;
+            align-items: stretch;
+            justify-content: space-around;
             flex-direction: column;
         }
 
-        #room {
-            background: rgba(0, 0, 0, 0.15);
-            padding: 0.25rem;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        .labelAndInput {
             display: flex;
-            height: 3rem;
-            box-sizing: border-box;
-            backdrop-filter: blur(10px);
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .input {
+            padding: 2px 5px;
+            width: 95%;
+        }
+
+        #buttonLogin {
+            background: #9fcbf5;
+            border: none;
+            border-radius: 10px;
+            height: 20px;
+            width: 40%;
+            margin: 0 30%;
+            outline: none;
+        }
+
+
+        #listGroup {
+            padding-top: 70px;
+            display: flex;
+            z-index: 3;
+            position: fixed;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30vw;
+            height: calc(100vh - 70px);
+            background: #333333;
+        }
+
+        #searchGroup {
+            margin: 10px;
+        }
+
+
+        #discussion {
+            margin-left: 30vw;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 70vw;
+            height: 100vh;
+        }
+
+        #myAccount {
+            color: #ffffff;
+            display: flex;
+            flex-direction: row;
+            position: fixed;
+            height: 70px;
+            z-index: 4;
+            align-items: center;
+        }
+
+        .room {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            border-top: 1px #3e3e3e solid;
+
+        }
+
+        .nameRoom {
+            color: #ffffff;
+            width: calc(30vw - 80px);
+            -webkit-hyphens: auto;
+            -moz-hyphens: auto;
+            -ms-hyphens: auto;
+            hyphens: auto;
+
+        }
+
+        #noResult {
+            width: 100%;
+            text-align: center;
         }
 
         #inputSearchGroup {
             border: none;
-            padding: 0 1rem;
+            padding: 5px 10px;
             flex-grow: 1;
             border-radius: 2rem;
-            margin: 0.25rem;
         }
 
         #inputSearchGroup:focus {
             outline: none;
         }
 
-        #room > button {
-            background: #333;
-            border: none;
-            padding: 0 1rem;
-            margin: 0.25rem;
-            border-radius: 3px;
-            outline: none;
-            color: #fff;
-        }
-
         #groups {
             list-style-type: none;
+            height: calc(100vh - 120px);
             margin: 0;
             padding: 0;
+            overflow-y: scroll;
+
         }
 
-        #groups > li {
-            padding: 0.5rem 1rem;
+        #groups::-webkit-scrollbar {
+            width: 0 !important
         }
 
-        #groups > li:nth-child(odd) {
-            background: #efefef;
-        }
-
-        #message {
-            background: rgba(0, 0, 0, 0.15);
-            padding: 0.25rem;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        #drawMessage {
+            background: #9a9a9a;
+            padding: 5px;
             display: flex;
-            height: 3rem;
-            box-sizing: border-box;
-            backdrop-filter: blur(10px);
+            height: 50px;
         }
 
         #inputMessage {
@@ -87,7 +168,7 @@
             outline: none;
         }
 
-        #message > button {
+        #drawMessage > button {
             background: #333;
             border: none;
             padding: 0 1rem;
@@ -99,56 +180,167 @@
 
         #messages {
             list-style-type: none;
-            margin: 0;
-            padding: 0;
+            overflow-y: scroll;
+            height: calc(100vh - 130px);
+            margin-bottom: 0;
+            padding: 20px 10px 0 0;
         }
 
-        #messages > li {
-            padding: 0.5rem 1rem;
+        #messages::-webkit-scrollbar {
+            width: 0 !important
         }
 
-        #messages > li:nth-child(odd) {
-            background: #efefef;
+        .myMessage {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            padding-left: 20px;
+
+        }
+
+        .otherMessage {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding-right: 20px;
+        }
+
+        .meSender {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .otherSender {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .mySend {
+            background: #9fcbf5;
+            border-radius: 10px;
+            padding: 5px 10px;
+            -moz-border-radius-topright: 0;
+
+
+        }
+
+        .otherSend {
+            background: #ededed;
+            border-radius: 10px;
+            padding: 5px 10px;
+            -moz-border-radius-topleft: 0;
+        }
+
+        #titleRoom {
+            z-index: 2;
+            display: flex;
+            height: 80px;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            background: #333333;
+            color: white;
+            box-shadow: 0px 0px 11px 5px rgba(0, 0, 0, 0.59);
+
         }
 
         .image_user {
             width: 50px;
+            height: 50px;
+            margin: 10px;
+            border-radius: 50%;
         }
+
+        #settings{
+            z-index: 5;
+            position: fixed;
+        }
+        #settingsIcon{
+            right: 0;
+            position: fixed;
+            margin: 15px;
+            z-index: 5;
+            align-items: stretch;
+            justify-content: stretch;
+            width: 40px;
+            height: 30px;
+
+        }
+        .fa-cog{
+            color: white;
+            font-size: 30px;
+        }
+        .messageConnect{
+            width: 70vw ;
+            height: 30px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .lineConnect{
+            border-top: #9a9a9a 2px dotted;
+            height: 1px;
+            width: calc((70vw - 230px) /2);
+
+        }
+        .textConnect{
+            color: #9a9a9a;
+
+
+        }
+
+
+
     </style>
 </head>
 <body>
 <div id="connexion" style="display : flex">
-    <form action="" id="login">
-        <input id="email" placeholder="Email" type="email" required>
-        <input id="pseudo" autocomplete="off" placeholder="Pseudo" required>
-        <input type="submit">
-    </form>
+    <div id="connectionArea">
+        <h1>CONNEXION</h1>
+        <form action="" id="login">
+            <div class="labelAndInput">
+                <label for="email" class="labelText">email: </label>
+                <input id="email" placeholder="Email" class="input" type="email" required>
+            </div>
+            <div class="labelAndInput">
+                <label for="pseudo" class="labelText">pseudo: </label>
+                <input id="pseudo" autocomplete="off" class="input" placeholder="Pseudo" required maxlength="15">
+            </div>
+
+            <input type="submit" id="buttonLogin" value="subscribe">
+        </form>
+    </div>
+
 </div>
+
+<div id="myAccount" style="display : none"></div>
 
 <div id="listGroup" style="display : none">
     <form id="searchGroup" action="">
-        <input id="inputSearchGroup" autocomplete="off"/>
-        <button>search</button>
+        <input id="inputSearchGroup" placeholder="Search group..." autocomplete="off"/>
     </form>
     <ul id="groups">
     </ul>
-    <div>
-        <ul id="onlineUsers"></ul>
-    </div>
+
 </div>
-
+<div id="settings">
+    <div id="settingsIcon"><i class="fas fa-cog"></i></div>
+</div>
+<div style="display: none">
+    <ul id="onlineUsers"></ul>
+</div>
 <div id="discussion" style="display : none">
-    <div><h1 id="titleRoom"></h1></div>
-    <ul id="messages">
-
-    </ul>
+    <div id="titleRoom"></div>
     <div>
-
-        <div id="writerArea"></div>
-        <form id="message" action="">
-            <input id="inputMessage" autocomplete="off"/>
-            <button>Send</button>
-        </form>
+        <ul id="messages"></ul>
+        <div>
+            <div id="writerArea"></div>
+            <form id="drawMessage" action="">
+                <input id="inputMessage" autocomplete="off"/>
+                <button>Send</button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -158,9 +350,10 @@
 <script>
     var listGroup = document.getElementById("listGroup");
     var socket = io("ws://localhost:3000");
-    var message = document.getElementById('message');
+    var message = document.getElementById('drawMessage');
     var messages = document.getElementById('messages');
     var inputMessage = document.getElementById('inputMessage');
+    var myAccount = document.getElementById('myAccount');
     var login = document.getElementById('login');
     var pseudo = document.getElementById('pseudo');
     var email = document.getElementById('email');
@@ -170,48 +363,51 @@
     var connexion = document.getElementById('connexion');
     var groups = document.getElementById('groups');
     var titleRoom = document.getElementById('titleRoom');
+    var settingsIcon = document.getElementById('settingsIcon');
+    var settings = document.getElementById('settings');
     var currentGroup;
     let inputSearchGroup = document.getElementById('inputSearchGroup');
 
-    let formData = new FormData ();
+    let formData = new FormData();
     let emailData = formData.get("email");
     let hash = md5(emailData);
 
 
+
     function myMessage(item, msg) {
-        item.innerHTML =
-            "<div>" +
-            "<div><h3>"+ msg["user"] +"</h3></div>" +
-            "<div>"+ msg["message"] +"</div>" +
-            "</div>"+
-            "<div><img class='image_user' src='https://www.gravatar.com/avatar/"+hash+"'></div>";
+        item.innerHTML = "<div>" +
+            "<div class ='meSender'><h3>" + msg["user"] + "</h3></div>" +
+            "<div class ='mySend'>" + msg["message"] + "</div>" +
+            "</div>" +
+            "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>";
     }
 
     function selectRoom() {
         document.querySelectorAll(".room").forEach(function (group) {
             group.addEventListener('click', (e) => {
+                messages.innerHTML = "";
                 e.preventDefault();
                 console.log("name room");
                 console.log(e.target.id);
                 console.log("");
                 currentGroup = e.target.id;
                 socket.emit('choice group', currentGroup);
-                listGroup.style.display = "none";
                 discussion.style.display = "flex";
-                titleRoom.innerHTML = currentGroup;
+                titleRoom.innerHTML = "<h1>" + currentGroup + "</h1>";
             })
         });
     };
 
-    function otherMessage(item, msg){
-        item.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/"+hash+"'></div>" +
+    function otherMessage(item, msg) {
+        item.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
             "<div>" +
-            "<div><h3>" + msg["user"] + "</h3></div>" +
-            "<div>" + msg["message"] + "</div>" +
-            "</div>"
+            "<div class = 'otherSender'><h3>" + msg["user"] + "</h3></div>" +
+            "<div class = 'otherSend'>" + msg["message"] + "</div>" +
+            "</div>";
+
     };
 
-    message.addEventListener('submit', function(e) {
+    message.addEventListener('submit', function (e) {
         e.preventDefault();
         if (inputMessage.value) {
             socket.emit('chat message', {
@@ -221,7 +417,7 @@
                 group: currentGroup
             });
             inputMessage.value = '';
-            socket.emit('noWritingUsers', pseudo.value);
+            socket.emit('noWritingUsers', {writer: pseudo.value, group: currentGroup});
             console.log(currentGroup);
             console.log("in sending message ");
         }
@@ -231,11 +427,14 @@
         let item = document.createElement('li');
         if (email.value === msg['userMail']) {
             myMessage(item, msg);
+            item.classList.add("myMessage");
         } else {
             otherMessage(item, msg);
+            item.classList.add("otherMessage");
         }
+
         messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        messages.scrollTop = messages.scrollHeight;
     });
 
     socket.on('writingUsers', (writers) => {
@@ -257,11 +456,16 @@
     socket.on('disconnected', (pseudoDc) => {
         console.log(pseudoDc);
         let item = document.createElement('li');
-        item.innerHTML = pseudoDc + " is disconnected";
+        item.innerHTML = "<div class='lineConnect'></div>" +
+            " <div class='textConnect'>"+pseudoDc + " is disconnected.</div> " +
+            "<div class='lineConnect'> </div>";
+
+        item.classList.add("messageConnect");
         messages.appendChild(item);
+        messages.scrollTop = messages.scrollHeight;
     });
 
-    login.addEventListener('submit', function(e) {
+    login.addEventListener('submit', function (e) {
         e.preventDefault();
         socket.emit('newUser', {
             pseudo: pseudo.value,
@@ -270,10 +474,15 @@
             socketKey: socket['id'],
             online: true
         });
+        myAccount.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
+            "<div>" +
+            "<div><h3>" + pseudo.value + "</h3></div>" +
+            "<div>" + email.value + "</div>" +
+            "</div>"
         listGroup.style.display = "flex";
+        myAccount.style.display = "flex";
         connexion.style.display = "none";
     });
-
 
 
     socket.on('draw old messages', (msg) => {
@@ -285,12 +494,15 @@
             let item = document.createElement('li');
             if (email.value === msg[i]['userMail']) {
                 myMessage(item, msg[i]);
+                item.classList.add("myMessage");
             } else {
                 otherMessage(item, msg[i]);
+                item.classList.add("otherMessage");
             }
             messages.appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
         }
+        messages.scrollTop = messages.scrollHeight;
         console.log("");
     });
 
@@ -298,8 +510,9 @@
         console.log(tabGroup);
         for (let i = 0; i < tabGroup.length; i++) {
             let item = document.createElement('li');
-            item.innerHTML = "<div id='" + tabGroup[i]["name"].toLowerCase() + "'><img class='image_user' id='" + tabGroup[i]["name"].toLowerCase() + "' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
-                "<div ><h3 id='" + tabGroup[i]["name"].toLowerCase() + "'>" + tabGroup[i]["name"] + "</h3></div>"
+            item.innerHTML = "<div id='" + tabGroup[i]["name"].toLowerCase() + "'>" +
+                "<img class='image_user' id='" + tabGroup[i]["name"].toLowerCase() + "' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
+                "<div ><h3 id='" + tabGroup[i]["name"].toLowerCase() + "' class='nameRoom'>" + tabGroup[i]["name"] + "</h3></div>"
 
             item.id = tabGroup[i]["name"].toLowerCase();
             item.classList.add("room");
@@ -312,13 +525,13 @@
         inputSearchGroup.addEventListener('input', () => {
             let tmp = 0;
             groups.innerHTML = "";
-            tabGroup.forEach (group => {
+            tabGroup.forEach(group => {
 
-                if (group['name'].toLowerCase().includes(inputSearchGroup.value)){
+                if (group['name'].toLowerCase().includes(inputSearchGroup.value)) {
                     tmp++;
                     let item = document.createElement('li');
-                    item.innerHTML += "<div id='" + group["name"].toLowerCase() + "'><img class='image_user' id='" + group["name"].toLowerCase() + "' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
-                        "<div ><h3 id='" + group["name"].toLowerCase() + "'>" + group["name"] + "</h3></div>"
+                    item.innerHTML += "<div id='" + group["name"].toLowerCase() + "'><img class='image_user' id='" + group["name"].toLowerCase() + "' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
+                        "<div ><h3 id='" + group["name"].toLowerCase() + "' class='nameRoom'>" + group["name"] + "</h3></div>"
                     item.id = group["name"].toLowerCase();
                     item.classList.add("room");
                     groups.appendChild(item);
@@ -326,8 +539,8 @@
                 }
 
             })
-            if (tmp === 0){
-                groups.innerHTML = "<h4>Aucun résultat</h4>"
+            if (tmp === 0) {
+                groups.innerHTML = "<h4 id='noResult'>Aucun résultat</h4>"
             }
             selectRoom();
         })
@@ -343,38 +556,51 @@
         onlineUsers.appendChild(item);
         for (let i = 0; i < usersOnline.length; i++) {
             let item = document.createElement('li');
-            item.innerHTML = "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+            item.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
                 "<div><h3>" + usersOnline[i]["pseudo"] + "</h3></div>";
             onlineUsers.appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
-        };
+        }
+        ;
         item = document.createElement('li');
         item.innerHTML = "<h4>Offline users</h4>";
         onlineUsers.appendChild(item);
         for (let i = 0; i < usersOffline.length; i++) {
             let item = document.createElement('li');
-            item.innerHTML = "<div><img class='image_user' src='https://static.remove.bg/remove-bg-web/0e54c692cee06c7cdf1bbe6015ddff9e88c6d03a/assets/start-0e837dcc57769db2306d8d659f53555feb500b3c5d456879b9c843d1872e7baa.jpg'/></div>" +
+            item.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
                 "<div><h3>" + usersOffline[i]["pseudo"] + "</h3></div>";
             onlineUsers.appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
-        };
+        }
+        ;
 
     })
 
     socket.on('connectedUsers', (users) => {
         let item = document.createElement('li');
-        item.innerHTML = users['pseudo'] + " is connected.";
+        item.innerHTML = "<div class='lineConnect'></div> " +
+            "<div class='textConnect'>   "+users['pseudo'] + " is connected.   </div>" +
+            " <div class='lineConnect'> </div>";
+        item.classList.add("messageConnect");
         messages.appendChild(item);
+        messages.scrollTop = messages.scrollHeight;
     });
 
     inputMessage.addEventListener('input', () => {
         console.log("typing");
         if (inputMessage.value !== '') {
             console.log(pseudo.value);
-            socket.emit('writingUsers', pseudo.value);
+            socket.emit('writingUsers', {writer: pseudo.value, group: currentGroup});
         } else {
-            socket.emit('noWritingUsers', pseudo.value);
+            socket.emit('noWritingUsers', {writer: pseudo.value, group: currentGroup});
         }
+    });
+
+    settingsIcon.addEventListener('click', () => {
+        settings.innerHTML+='<div>' +
+            '<div>general settings</div>' +
+            '<div>group settings</div>' +
+            '</div>';
     });
 
 
