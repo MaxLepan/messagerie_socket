@@ -377,7 +377,6 @@ body {
     width: 50vw;
     left: 25vw;
 
-    border-radius: 50%;
 }
 
 #settingImg {
@@ -398,4 +397,22 @@ body {
 a {
     color: white;
     text-decoration: none;
+}
+
+.la-thumbtack-me {
+    position: relative;
+    font-size: 20px;
+    margin-top: 30px;
+
+}
+
+
+.la-thumbtack-other {
+    position: relative;
+    font-size: 20px;
+    margin-top: 30px;
+}
+
+.pin-position {
+    display: flex;
 }

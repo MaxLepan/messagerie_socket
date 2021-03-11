@@ -32,6 +32,7 @@ function myMessage(item, msg) {
         "<div class ='meSender'><h3>" + msg["user"] + "</h3></div>" +
         "<div class ='mySend'>" + msg["message"] + "</div>" +
         "</div>" +
+        "<div class='pinned' style='display: none'><i class='las la-thumbtack la-thumbtack-me'></i></div>" +
         "<div><img class='image_user' src='"+msg["userImg"]+"'></div>";
 }
 
@@ -68,16 +69,17 @@ function selectRoom() {
 
         })
     });
-};
+}
 
 function otherMessage(item, msg) {
     item.innerHTML = "<div><img class='image_user' src='"+msg["userImg"]+"'></div>" +
+        "<div class='pinned' style='display: none'><i class='las la-thumbtack la-thumbtack-other '></i></div>" +
         "<div>" +
         "<div class = 'otherSender'><h3>" + msg["user"] + "</h3></div>" +
         "<div class = 'otherSend'>" + msg["message"] + "</div>" +
         "</div>";
 
-};
+}
 
 message.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -108,6 +110,12 @@ socket.on('chat message', function (msg) {
 
     messages.appendChild(item);
     messages.scrollTop = messages.scrollHeight;
+
+    document.addEventListener('click', () => {
+
+    })
+
+    console.log(msg);
 });
 
 socket.on('writingUsers', (writers) => {
@@ -324,3 +332,11 @@ userAccount.addEventListener('click', () => {
     })
 })
 
+messages.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    console.log(e.target.querySelector('.pinned'));
+    e.target.querySelector('.pinned').style.display = 'flex';
+
+
+})
