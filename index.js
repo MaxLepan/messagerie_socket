@@ -106,7 +106,7 @@ io.on('connection', (socket) => {
             users.push(user);
         }
         socket.emit('users', users);
-        socket.emit('draw groups', groups);
+        io.emit('draw groups', groups);
         io.emit('participants', users);
         //console.log(users);
 
@@ -156,7 +156,7 @@ io.on('connection', (socket) => {
             writers.push(writerAndGroup["writer"]);
         }
 
-        socket.to(writerAndGroup["group"]).emit('writingUsers', writers);
+        io.to(writerAndGroup["group"]).emit('writingUsers', writers);
     })
 
     socket.on('noWritingUsers', (writerAndGroup) => {
@@ -171,7 +171,7 @@ io.on('connection', (socket) => {
 
         }
 
-        socket.to(writerAndGroup["group"]).emit('writingUsers', writers);
+        io.to(writerAndGroup["group"]).emit('writingUsers', writers);
     })
 
 
