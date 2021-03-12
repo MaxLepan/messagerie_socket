@@ -11,6 +11,9 @@ const io = require("socket.io")(http, {
 //defines the port
 const port = process.env.PORT || 3000;
 
+let id_message =0;
+
+
 
 let users = [];
 let messages = [];
@@ -37,10 +40,14 @@ app.use(express.static('public'));
 
 //when a user id connected
 io.on('connection', (socket) => {
+    io.emit("current id message", id_message)
+
 
     //when the server receives a messsage
     socket.on('chat message', (msg) => {
         //the server emits the message to every user in the chat room
+        id_message++;
+        io.emit("current id message", id_message)
         io.in(msg["group"]).emit('chat message', msg);
         messages.push(msg);
 
@@ -124,6 +131,9 @@ io.on('connection', (socket) => {
         }
 
         let groupMessages = messages.filter(message => message["group"] === group);
+
+
+
         socket.emit('draw old messages', groupMessages);
     });
 
@@ -154,7 +164,7 @@ io.on('connection', (socket) => {
                 writerBool = false;
             }
         }
-        //if the writer wasnt already typing
+        //if the writer wasn't already typing
         if (writerBool) {
             //add him in the writer array
             writers.push(writerAndGroup["writer"]);
@@ -162,6 +172,12 @@ io.on('connection', (socket) => {
 
         //emits to the room to list of writing users
         socket.to(writerAndGroup["group"]).emit('writingUsers', writers);
+    })
+    socket.on("add pinMessages", id=>{
+        console.log(messages[id]["message"])
+
+        messages[id]["pin"]=true;
+        console.log(messages[id]["pin"])
     })
 
     socket.on('noWritingUsers', (writerAndGroup) => {

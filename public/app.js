@@ -20,6 +20,8 @@ let searchGroup = document.getElementById('searchGroup');
 let inputSearchGroup = document.getElementById('inputSearchGroup');
 let userAccount = document.getElementById('myAccount');
 let userSettings = document.getElementById('userSettings');
+let id_message;
+let pinMessage;
 
 //defines the socket
 let socket = io();
@@ -29,13 +31,18 @@ let hash = md5(email.value);
 let currentGroup;
 let quitUserSettings;
 
+socket.on("current id message", currentIdMessage => {
+    id_message = currentIdMessage;
+})
+
+
 //Draws messages sent by "me"
 function myMessage(item, msg) {
     item.innerHTML = "<div>" +
         "<div class ='meSender'><h3>" + msg["user"] + "</h3></div>" +
-        "<div class ='mySend'>" + msg["message"] + "</div>" +
+        "<div class ='send mySend' id='" + msg["id_message"] + "'>" + msg["message"] + "</div>" +
         "</div>" +
-        "<div class='pinned' style='display: none'><i class='las la-thumbtack la-thumbtack-me'></i></div>" +
+        "<div class='pinned'><i class='las la-thumbtack la-thumbtack-me'></i></div>" +
         "<div><img class='image_user' src='" + msg["userImg"] + "'></div>";
 }
 
@@ -77,10 +84,10 @@ function selectRoom() {
 //draws messages sent by other users
 function otherMessage(item, msg) {
     item.innerHTML = "<div><img class='image_user' src='" + msg["userImg"] + "'></div>" +
-        "<div class='pinned' style='display: none'><i class='las la-thumbtack la-thumbtack-other '></i></div>" +
+        "<div class='pinned'><i class='las la-thumbtack la-thumbtack-other '></i></div>" +
         "<div>" +
         "<div class = 'otherSender'><h3>" + msg["user"] + "</h3></div>" +
-        "<div class = 'otherSend'>" + msg["message"] + "</div>" +
+        "<div class = 'send otherSend' id='" + msg["id_message"] + "'>" + msg["message"] + "</div>" +
         "</div>";
 
 }
@@ -90,6 +97,8 @@ message.addEventListener('submit', function (e) {
     e.preventDefault();
     if (inputMessage.value) {
         socket.emit('chat message', {
+            id_message: id_message,
+            pin: false,
             message: inputMessage.value,
             userMail: email.value,
             user: nickname.value,
@@ -114,8 +123,10 @@ socket.on('chat message', function (msg) {
         item.classList.add("otherMessage");
     }
 
+
     messages.appendChild(item);
     messages.scrollTop = messages.scrollHeight;
+    item.querySelector(".pinned").classList.add("hidden");
 
     document.addEventListener('click', () => {
 
@@ -192,12 +203,19 @@ socket.on('draw old messages', (msg) => {
         if (email.value === msg[i]['userMail']) {
             myMessage(item, msg[i]);
             item.classList.add("myMessage");
+
         } else {
             otherMessage(item, msg[i]);
             item.classList.add("otherMessage");
         }
+
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
+
+        if (!msg[i]["pin"]){
+            console.log(item.querySelector(".pinned"))
+            item.querySelector(".pinned").classList.add("hidden");
+        }
     }
     messages.scrollTop = messages.scrollHeight;
 });
@@ -225,7 +243,7 @@ socket.on('draw groups', (tabGroup) => {
         groups.innerHTML = "";
         tabGroup.forEach(group => {
 
-            if (group['name'].toLowerCase().replace("_"," ").includes(inputSearchGroup.value)) {
+            if (group['name'].toLowerCase().replace("_", " ").includes(inputSearchGroup.value)) {
                 tmp++;
                 let item = document.createElement('li');
                 item.innerHTML += "<div id='" + group["name"] + "'>" +
@@ -257,14 +275,14 @@ socket.on('participants', (users) => {
     let usersOffline = users.filter(user => user["online"] === false)
     for (let i = 0; i < usersOnline.length; i++) {
         let item = document.createElement('li');
-        item.innerHTML = "<div class='userLi'><div class='online'></div><img class='image_user' src='"+ usersOnline[i]["img"]+ "'>" +
+        item.innerHTML = "<div class='userLi'><div class='online'></div><img class='image_user' src='" + usersOnline[i]["img"] + "'>" +
             "<h4>" + usersOnline[i]["pseudo"] + "</h4></div>";
         onlineUsers.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     }
     for (let i = 0; i < usersOffline.length; i++) {
         let item = document.createElement('li');
-        item.innerHTML = "<div class='userLi'><div class='offline'></div><img class='image_user' src='"+ usersOffline[i]["img"]+ "'>" +
+        item.innerHTML = "<div class='userLi'><div class='offline'></div><img class='image_user' src='" + usersOffline[i]["img"] + "'>" +
             "<h4>" + usersOffline[i]["pseudo"] + "</h4></div>";
         onlineUsers.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
@@ -311,7 +329,7 @@ settingsIcon.addEventListener('click', () => {
 
 //creates a new group when the "plus" icon is clicked
 addIcon.addEventListener('click', () => {
-    if (inputSearchGroup.value){
+    if (inputSearchGroup.value) {
         socket.emit("newGroup", {
             name: inputSearchGroup.value.toLowerCase().replace(" ", "_"),
             users: [email.value]
@@ -335,10 +353,18 @@ userAccount.addEventListener('click', () => {
     })
 })
 
-//pins a message when clicked on
-messages.addEventListener('click', (e) => {
-    e.stopPropagation();
-
-    e.target.querySelector('.pinned').style.display = 'flex';
-
+socket.on("tab pinMessage", pinMessage => {
+        //document.querySelector("#"+pinMessage+"").querySelector(".send").classList.remove('hidden');
 })
+
+//pins a message when clicked on
+messages.addEventListener('click', () => {
+    messages.querySelectorAll(".myMessage, .otherMessage").forEach(messagePinned => {
+        messagePinned.addEventListener('click', (e) => {
+            console.log(messagePinned.querySelector(".send").id)
+            messagePinned.querySelector(".pinned").classList.remove("hidden");
+            socket.emit("add pinMessages", messagePinned.querySelector(".send").id);
+        })
+    })
+})
+

@@ -166,7 +166,9 @@ body {
     display: flex;
     height: 50px;
 }
-
+#general{
+    background: #151515;
+}
 #inputMessage {
     border: none;
     padding: 0 1rem;
@@ -226,22 +228,18 @@ body {
     justify-content: flex-start;
 }
 
+.send{
+    padding: 5px 10px;
+}
+
 .mySend {
     background: #9fcbf5;
     border-radius: 10px 0 10px 10px;
-    padding: 5px 10px;
-    -moz-border-radius-topright: 0;
-    word-break: break-all;
-
-
 }
 
 .otherSend {
     background: #ededed;
     border-radius:0 10px 10px 10px;
-    padding: 5px 10px;
-    -moz-border-radius-topleft: 0;
-    word-break: break-all;
 }
 
 #titleRoom {
@@ -254,7 +252,6 @@ body {
     background: #333333;
     color: white;
     box-shadow: 0 0 11px 5px rgba(0, 0, 0, 0.59);
-
 }
 
 .image_user {
@@ -471,7 +468,9 @@ a{
     background: #363636;
     margin-top: 3px;
 }
-
+.pinned{
+    display: flex;
+}
 .pin-position {
     display: flex;
 }
@@ -501,4 +500,7 @@ a{
     align-items: center;
     justify-content: flex-start;
     border-top: #464646 2px solid;
+}
+.hidden{
+    display: none;
 }
