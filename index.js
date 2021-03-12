@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
         io.in(group).emit('participants', users.filter(userIndex =>groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === userIndex["email"])));
     });
 
-    //when a user leave the grouop
+    //when a user leave the group
     socket.on('quit group', (group) => {
         socket.leave(group);
     });

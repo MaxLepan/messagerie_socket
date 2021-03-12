@@ -16,6 +16,7 @@ let titleRoom = document.getElementById('titleRoom');
 let settingsIcon = document.getElementById('settingsIcon');
 let addIcon = document.getElementById("addIcon")
 let settings = document.getElementById('settings');
+let searchGroup = document.getElementById('searchGroup');
 let inputSearchGroup = document.getElementById('inputSearchGroup');
 let userAccount = document.getElementById('myAccount');
 let userSettings = document.getElementById('userSettings');
@@ -224,7 +225,7 @@ socket.on('draw groups', (tabGroup) => {
         groups.innerHTML = "";
         tabGroup.forEach(group => {
 
-            if (group['name'].toLowerCase().includes(inputSearchGroup.value)) {
+            if (group['name'].toLowerCase().replace("_"," ").includes(inputSearchGroup.value)) {
                 tmp++;
                 let item = document.createElement('li');
                 item.innerHTML += "<div id='" + group["name"] + "'>" +
@@ -295,11 +296,8 @@ inputMessage.addEventListener('input', () => {
 });
 
 //creates a new group
-inputSearchGroup.addEventListener('submit', () => {
-    socket.emit("newGroup", {
-        name: inputSearchGroup.value.toLowerCase().replace(" ", "_"),
-        users: [email.value]
-    });
+searchGroup.addEventListener('submit', (e) => {
+    e.preventDefault();
 })
 
 //displays the settings and connected/disconnected users list
@@ -313,10 +311,13 @@ settingsIcon.addEventListener('click', () => {
 
 //creates a new group when the "plus" icon is clicked
 addIcon.addEventListener('click', () => {
-    socket.emit("newGroup", {
-        name: inputSearchGroup.value.toLowerCase().replace(" ", "_"),
-        users: [email.value]
-    });
+    if (inputSearchGroup.value){
+        socket.emit("newGroup", {
+            name: inputSearchGroup.value.toLowerCase().replace(" ", "_"),
+            users: [email.value]
+        });
+    }
+
 });
 
 //displays the user settings
