@@ -241,20 +241,20 @@ socket.on("select Room with add", () => {
 
 
 socket.on('participants', (users) => {
-    console.log(users);
+    console.log(users+"lol");
     onlineUsers.innerHTML = "";
     let usersOnline = users.filter(user => user["online"] === true);
     let usersOffline = users.filter(user => user["online"] === false)
     for (let i = 0; i < usersOnline.length; i++) {
         let item = document.createElement('li');
-        item.innerHTML = "<div class='userLi'><div class='online'></div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'>" +
+        item.innerHTML = "<div class='userLi'><div class='online'></div><img class='image_user' src='"+ usersOnline[i]["img"]+ "'>" +
             "<h4>" + usersOnline[i]["pseudo"] + "</h4></div>";
         onlineUsers.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     }
     for (let i = 0; i < usersOffline.length; i++) {
         let item = document.createElement('li');
-        item.innerHTML = "<div class='userLi'><div class='offline'></div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'>" +
+        item.innerHTML = "<div class='userLi'><div class='offline'></div><img class='image_user' src='"+ usersOffline[i]["img"]+ "'>" +
             "<h4>" + usersOffline[i]["pseudo"] + "</h4></div>";
         onlineUsers.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);

@@ -93,12 +93,14 @@ io.on('connection', (socket) => {
         console.log(users);
 
     });
+
+
     socket.on("participants group", group => {
-        console.log(users)
+        console.log(group)
         console.log(groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === users[0]["email"]))
-        console.log(users.filter(userIndex => userIndex["email"] === groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === userIndex["email"])))
-        socket.in(group).emit('participants', users.filter(userIndex => userIndex["email"] === groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === userIndex["email"])));
-    })
+        console.log(users.filter(userIndex =>groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === userIndex["email"])))
+        io.in(group).emit('participants', users.filter(userIndex =>groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === userIndex["email"])));
+    });
 
 
     socket.on('quit group', (group) => {
@@ -107,8 +109,11 @@ io.on('connection', (socket) => {
 
     socket.on('choice group', (group) => {
         socket.join(group);
-        console.log(groups.findIndex((room) => room["name"] === group));
-        if (groups[groups.findIndex((room) => room["name"] === group)]["users"] === users.find(user => socket['id'] === user['socketKey'])["email"]) {
+        console.log(groups[groups.findIndex((room) => room["name"] === group)]["users"]);
+        console.log(users.find(user => socket['id'] === user['socketKey'])["email"])
+        console.log(groups[groups.findIndex((room) => room["name"] === group)]["users"].some(userEmail => userEmail === users.find(user => socket['id'] === user['socketKey'])["email"]))
+
+        if (!groups[groups.findIndex((room) => room["name"] === group)]["users"].some(userEmail => userEmail === users.find(user => socket['id'] === user['socketKey'])["email"])) {
             groups[groups.findIndex((room) => room["name"] === group)]["users"].push(users.find(user => socket['id'] === user['socketKey'])["email"])
         }
 
