@@ -49,7 +49,8 @@ io.on('connection', (socket) => {
                 groups[i]["users"].push(users.find(user => socket['id'] === user['socketKey'])["email"])
                 console.log(groups[i]['users']);
 
-            }console.log(groups[i]);
+            }
+            console.log(groups[i]);
         }
 
 
@@ -58,14 +59,18 @@ io.on('connection', (socket) => {
             groups.push(group);
         }
         socket.emit('select Room with add', group);
-        socket.emit('draw groups', groups)
+        io.emit('draw groups', groups)
 
     });
 
     socket.on('newUser', function (user) {
 
         newUser = true;
-        groups[0]["users"].push(user["email"]);
+        console.log(groups[0]["users"].some(userEmail => userEmail === user["email"]))
+        if (!groups[0]["users"].some(userEmail => userEmail === user["email"])) {
+            groups[0]["users"].push(user["email"]);
+        }
+
 
         for (let i = 0; i < users.length; i++) {
             if (user["email"] === users[i]["email"]) {
@@ -80,12 +85,20 @@ io.on('connection', (socket) => {
         }
         socket.emit('users', users);
         socket.emit('draw groups', groups);
-        io.emit('participants', users);
-        //console.log(users);
+
+
+
+
         socket.broadcast.emit('connectedUsers', user);
         console.log(users);
 
     });
+    socket.on("participants group", group => {
+        console.log(users)
+        console.log(groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === users[0]["email"]))
+        console.log(users.filter(userIndex => userIndex["email"] === groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === userIndex["email"])))
+        socket.in(group).emit('participants', users.filter(userIndex => userIndex["email"] === groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === userIndex["email"])));
+    })
 
 
     socket.on('quit group', (group) => {
@@ -94,9 +107,9 @@ io.on('connection', (socket) => {
 
     socket.on('choice group', (group) => {
         socket.join(group);
-        console.log(groups.findIndex((room) =>room["name"]===group) );
-        if (groups[groups.findIndex((room) =>room["name"]===group)]["users"]===users.find(user => socket['id'] === user['socketKey'])["email"]){
-            groups[groups.findIndex((room) =>room["name"]===group)]["users"].push(users.find(user => socket['id'] === user['socketKey'])["email"])
+        console.log(groups.findIndex((room) => room["name"] === group));
+        if (groups[groups.findIndex((room) => room["name"] === group)]["users"] === users.find(user => socket['id'] === user['socketKey'])["email"]) {
+            groups[groups.findIndex((room) => room["name"] === group)]["users"].push(users.find(user => socket['id'] === user['socketKey'])["email"])
         }
 
         let groupMessages = messages.filter(message => message["group"] === group);

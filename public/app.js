@@ -21,10 +21,9 @@ let inputSearchGroup = document.getElementById('inputSearchGroup');
 let hash = md5(email.value);
 let userAccount = document.getElementById('myAccount');
 let userSettings = document.getElementById('userSettings');
+let quitSetting = document.getElementById("quitSettings")
+
 let quitUserSettings;
-
-
-
 
 
 function myMessage(item, msg) {
@@ -33,34 +32,32 @@ function myMessage(item, msg) {
         "<div class ='mySend'>" + msg["message"] + "</div>" +
         "</div>" +
         "<div class='pinned' style='display: none'><i class='las la-thumbtack la-thumbtack-me'></i></div>" +
-        "<div><img class='image_user' src='"+msg["userImg"]+"'></div>";
+        "<div><img class='image_user' src='" + msg["userImg"] + "'></div>";
 }
 
-function drawRoom(currentGroup){
+function drawRoom(currentGroup) {
     messages.innerHTML = "";
-
-    console.log("name room");
-    console.log("");
-    if (currentGroup){
-        socket.emit('quit group', currentGroup);
-    }
-
-
-
     socket.emit('choice group', currentGroup);
     discussion.style.display = "flex";
-    titleRoom.innerHTML = "<h1>" + currentGroup + "</h1>";
+    titleRoom.innerHTML = "<h1>" + currentGroup.replace("_", " ") + "</h1>";
+    socket.emit("participants group", currentGroup);
 }
 
 function selectRoom() {
     document.querySelectorAll(".room, #addIcon").forEach(function (group) {
         group.addEventListener('click', (e) => {
             e.preventDefault();
-            if (e.target.id === "addIcon" && inputSearchGroup.value){
-                currentGroup = inputSearchGroup.value
-                inputSearchGroup.value ="";
+            if (e.target.id === "addIcon" && inputSearchGroup.value) {
+                if (currentGroup) {
+                    socket.emit('quit group', currentGroup);
+                }
+                currentGroup = inputSearchGroup.value.toLowerCase().replace(" ", "_")
+                inputSearchGroup.value = "";
                 drawRoom(currentGroup)
-            }else if (e.target.id !== "addIcon") {
+            } else if (e.target.id !== "addIcon") {
+                if (currentGroup) {
+                    socket.emit('quit group', currentGroup);
+                }
                 currentGroup = e.target.id;
                 drawRoom(currentGroup)
 
@@ -72,7 +69,7 @@ function selectRoom() {
 }
 
 function otherMessage(item, msg) {
-    item.innerHTML = "<div><img class='image_user' src='"+msg["userImg"]+"'></div>" +
+    item.innerHTML = "<div><img class='image_user' src='" + msg["userImg"] + "'></div>" +
         "<div class='pinned' style='display: none'><i class='las la-thumbtack la-thumbtack-other '></i></div>" +
         "<div>" +
         "<div class = 'otherSender'><h3>" + msg["user"] + "</h3></div>" +
@@ -88,7 +85,7 @@ message.addEventListener('submit', function (e) {
             message: inputMessage.value,
             userMail: email.value,
             user: pseudo.value,
-            userImg : 'https://www.gravatar.com/avatar/' + hash,
+            userImg: 'https://www.gravatar.com/avatar/' + hash,
             group: currentGroup
         });
         inputMessage.value = '';
@@ -121,7 +118,7 @@ socket.on('chat message', function (msg) {
 socket.on('writingUsers', (writers) => {
     if (writers.length !== 0) {
         writerArea.innerHTML = "<div id ='textWriterArea'>"
-        var drawArea = true;
+        let drawArea = true;
         for (let i = 0; i < writers.length; i++) {
             if (writers[i] !== pseudo.value) {
                 writerArea.innerHTML += writers[i] + ", ";
@@ -131,7 +128,7 @@ socket.on('writingUsers', (writers) => {
         }
 
         writerArea.innerHTML += " is typing... &nbsp;</div>";
-        if (!drawArea){
+        if (drawArea) {
             writerArea.innerHTML = '';
         }
     } else {
@@ -144,7 +141,7 @@ socket.on('disconnected', (pseudoDc) => {
     console.log(pseudoDc);
     let item = document.createElement('li');
     item.innerHTML = "<div class='lineConnect'></div>" +
-        " <div class='textConnect'>"+pseudoDc + " is disconnected.</div> " +
+        " <div class='textConnect'>" + pseudoDc + " is disconnected.</div> " +
         "<div class='lineConnect'> </div>";
 
     item.classList.add("messageConnect");
@@ -158,10 +155,11 @@ login.addEventListener('submit', function (e) {
     socket.emit('newUser', {
         pseudo: pseudo.value,
         email: email.value,
-        img: 'https://www.gravatar.com/avatar/' + hash ,
+        img: 'https://www.gravatar.com/avatar/' + hash,
         socketKey: socket['id'],
         online: true
     });
+    socket.emit("participants group", "general");
     myAccount.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
         "<div>" +
         "<div><h3>" + pseudo.value + "</h3></div>" +
@@ -196,14 +194,14 @@ socket.on('draw old messages', (msg) => {
 
 socket.on('draw groups', (tabGroup) => {
     console.log(tabGroup);
-    groups.innerHTML= "";
+    groups.innerHTML = "";
     for (let i = 0; i < tabGroup.length; i++) {
         let item = document.createElement('li');
-        item.innerHTML = "<div id='" + tabGroup[i]["name"].toLowerCase() + "'>" +
-            "<img class='image_user' id='" + tabGroup[i]["name"].toLowerCase() + "' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
-            "<div ><h3 id='" + tabGroup[i]["name"].toLowerCase() + "' class='nameRoom'>" + tabGroup[i]["name"] + "</h3></div>"
+        item.innerHTML = "<div id='" + tabGroup[i]["name"] + "'>" +
+            "<div ><h3 id='" + tabGroup[i]["name"] + "' class='nameRoom'>" +
+            tabGroup[i]["name"].replace("_", " ") + "</h3></div>"
 
-        item.id = tabGroup[i]["name"].toLowerCase();
+        item.id = tabGroup[i]["name"];
         item.classList.add("room");
         groups.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
@@ -219,9 +217,9 @@ socket.on('draw groups', (tabGroup) => {
             if (group['name'].toLowerCase().includes(inputSearchGroup.value)) {
                 tmp++;
                 let item = document.createElement('li');
-                item.innerHTML += "<div id='" + group["name"].toLowerCase() + "'><img class='image_user' id='" + group["name"].toLowerCase() + "' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
-                    "<div ><h3 id='" + group["name"].toLowerCase() + "' class='nameRoom'>" + group["name"] + "</h3></div>"
-                item.id = group["name"].toLowerCase();
+                item.innerHTML += "<div id='" + group["name"] + "'>" +
+                    "<div ><h3 id='" + group["name"] + "' class='nameRoom'>" + group["name"].replace("_", " ") + "</h3></div>"
+                item.id = group["name"];
                 item.classList.add("room");
                 groups.appendChild(item);
                 window.scrollTo(0, document.body.scrollHeight);
@@ -236,34 +234,28 @@ socket.on('draw groups', (tabGroup) => {
 
 });
 
-socket.on("select Room with add", () =>{
+socket.on("select Room with add", () => {
     console.log("selectRoom")
     selectRoom();
 })
 
 
 socket.on('participants', (users) => {
+    console.log(users);
     onlineUsers.innerHTML = "";
     let usersOnline = users.filter(user => user["online"] === true);
-    let usersOffline = users.filter(user => user["online"] === false);
-    let item = document.createElement('li');
-    item.innerHTML = "<h3>Online users</h3>";
-    onlineUsers.appendChild(item);
+    let usersOffline = users.filter(user => user["online"] === false)
     for (let i = 0; i < usersOnline.length; i++) {
         let item = document.createElement('li');
-        item.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
-            "<div><h3>" + usersOnline[i]["pseudo"] + "</h3></div>";
+        item.innerHTML = "<div class='userLi'><div class='online'></div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'>" +
+            "<h4>" + usersOnline[i]["pseudo"] + "</h4></div>";
         onlineUsers.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     }
-
-    item = document.createElement('li');
-    item.innerHTML = "<h3>Offline users</h3>";
-    onlineUsers.appendChild(item);
     for (let i = 0; i < usersOffline.length; i++) {
         let item = document.createElement('li');
-        item.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
-            "<div><h3>" + usersOffline[i]["pseudo"] + "</h3></div>";
+        item.innerHTML = "<div class='userLi'><div class='offline'></div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'>" +
+            "<h4>" + usersOffline[i]["pseudo"] + "</h4></div>";
         onlineUsers.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     }
@@ -274,7 +266,7 @@ socket.on('participants', (users) => {
 socket.on('connectedUsers', (users) => {
     let item = document.createElement('li');
     item.innerHTML = "<div class='lineConnect'></div> " +
-        "<div class='textConnect'>   "+users['pseudo'] + " is connected.   </div>" +
+        "<div class='textConnect'>   " + users['pseudo'] + " is connected.   </div>" +
         " <div class='lineConnect'> </div>";
     item.classList.add("messageConnect");
 
@@ -294,40 +286,41 @@ inputMessage.addEventListener('input', () => {
     console.log(hash);
 });
 
+inputSearchGroup.addEventListener('submit', () => {
+    console.log("submit")
+    socket.emit("newGroup", {
+        name: inputSearchGroup.value.toLowerCase().replace(" ", "_"),
+        users: [email.value]
+    });
+})
+
 settingsIcon.addEventListener('click', () => {
     settings.style.display = "flex";
+    console.log("clic icon")
+    socket.emit("participants group", currentGroup);
+    quitSettings.addEventListener('click', () => {
+        settings.style.display = 'none';
+    })
 });
 
 addIcon.addEventListener('click', () => {
     socket.emit("newGroup", {
-        name : inputSearchGroup.value,
+        name: inputSearchGroup.value.toLowerCase().replace(" ", "_"),
         users: [email.value]
     });
 });
 
 userAccount.addEventListener('click', () => {
     console.log("user settings click");
-    userSettings.style.display = 'block';
-    userSettings.innerHTML = `
-    <div id="quitUserSettings">
-        <i class="las la-angle-left"></i>
-    </div>
-    <div id="settingsImgContainer">
-        <a target="_blank" rel="noopener noreferrer" href="https://fr.gravatar.com/">
-            <img title="Changer de photo de profil" id="settingImg" src="https://www.gravatar.com/avatar/${hash}">
-        </a>
-    </div>
-<div>
-    <h2>${pseudo.value}</h2>
-    <h3>${email.value}</h3>
-    
-    
-</div>`
+    userSettings.style.display = 'flex';
+    userSettings.querySelector("img").src = "https://www.gravatar.com/avatar/" + hash + "s=300"
+    document.querySelector("#pseudoUser").innerHTML = pseudo.value;
+    document.querySelector("#emailUser").innerHTML = email.value;
+
 
     quitUserSettings = document.getElementById('quitUserSettings');
 
     quitUserSettings.addEventListener('click', () => {
-
         userSettings.style.display = 'none';
     })
 })
