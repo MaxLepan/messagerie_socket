@@ -1,3 +1,4 @@
+//server variables
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
@@ -7,7 +8,9 @@ const io = require("socket.io")(http, {
         methods: ["GET", "POST"]
     }
 });
+//defines the port
 const port = process.env.PORT || 3000;
+
 
 let users = [];
 let messages = [];
@@ -51,16 +54,13 @@ io.on('connection', (socket) => {
             if (group["name"] === groups[i]["name"]) {
                 newGroup = false;
                 groups[i]["users"].push(users.find(user => socket['id'] === user['socketKey'])["email"])
-                console.log(groups[i]['users']);
 
             }
-            console.log(groups[i]);
         }
 
         //if the group name doesnt exists
         if (newGroup) {
             //create a new group
-            console.log("add room")
             groups.push(group);
         }
         socket.emit('select Room with add', group);
@@ -72,7 +72,6 @@ io.on('connection', (socket) => {
     socket.on('newUser', function (user) {
         //if the user's email is not already existing
         newUser = true;
-        console.log(groups[0]["users"].some(userEmail => userEmail === user["email"]))
         if (!groups[0]["users"].some(userEmail => userEmail === user["email"])) {
             groups[0]["users"].push(user["email"]);
         }
@@ -97,14 +96,10 @@ io.on('connection', (socket) => {
 
         //emits to every user except the sender the connected users list
         socket.broadcast.emit('connectedUsers', user);
-        console.log(users);
     });
 
 
     socket.on("participants group", group => {
-        console.log(users)
-        console.log(groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === users[0]["email"]))
-        console.log(users.filter(userIndex => userIndex["email"] === groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === userIndex["email"])))
         socket.in(group).emit('participants', users.filter(userIndex => userIndex["email"] === groups[groups.findIndex(groupIndex => groupIndex["name"] === group)]["users"].find(userEmail => userEmail === userIndex["email"])));
     })
 
@@ -116,13 +111,11 @@ io.on('connection', (socket) => {
 
     socket.on('choice group', (group) => {
         socket.join(group);
-        console.log(groups.findIndex((room) => room["name"] === group));
         if (groups[groups.findIndex((room) => room["name"] === group)]["users"] === users.find(user => socket['id'] === user['socketKey'])["email"]) {
             groups[groups.findIndex((room) => room["name"] === group)]["users"].push(users.find(user => socket['id'] === user['socketKey'])["email"])
         }
 
         let groupMessages = messages.filter(message => message["group"] === group);
-        console.log(groups)
         socket.emit('draw old messages', groupMessages);
     });
 
@@ -132,8 +125,6 @@ io.on('connection', (socket) => {
         //if the disconnected socket correspond to a user's socket
         for (let i = 0; i < users.length; i++) {
             if (socket['id'] === users[i]['socketKey']) {
-                //console.log(users[i]['socketKey']);
-                //console.log(socket['id']);
                 //then the user is disconnected and emits to other users his deconnection
                 users[i]['online'] = false;
                 io.emit('disconnected', users[i]['pseudo']);
