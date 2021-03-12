@@ -1,31 +1,34 @@
-var listGroup = document.getElementById("listGroup");
-var socket = io();
-var message = document.getElementById('drawMessage');
-var messages = document.getElementById('messages');
-var inputMessage = document.getElementById('inputMessage');
-var myAccount = document.getElementById('myAccount');
-var login = document.getElementById('login');
-var pseudo = document.getElementById('pseudo');
-var email = document.getElementById('email');
-var writerArea = document.getElementById('writerArea');
+//finds the ids in the HTML
+let listGroup = document.getElementById("listGroup");
+let message = document.getElementById('drawMessage');
+let messages = document.getElementById('messages');
+let inputMessage = document.getElementById('inputMessage');
+let myAccount = document.getElementById('myAccount');
+let login = document.getElementById('login');
+let nickname = document.getElementById('pseudo');
+let email = document.getElementById('email');
+let writerArea = document.getElementById('writerArea');
 let onlineUsers = document.getElementById('onlineUsers');
-var discussion = document.getElementById('discussion');
-var connexion = document.getElementById('connexion');
-var groups = document.getElementById('groups');
-var titleRoom = document.getElementById('titleRoom');
-var settingsIcon = document.getElementById('settingsIcon');
-var addIcon = document.getElementById("addIcon")
-var settings = document.getElementById('settings');
-var currentGroup;
+let discussion = document.getElementById('discussion');
+let connexion = document.getElementById('connexion');
+let groups = document.getElementById('groups');
+let titleRoom = document.getElementById('titleRoom');
+let settingsIcon = document.getElementById('settingsIcon');
+let addIcon = document.getElementById("addIcon")
+let settings = document.getElementById('settings');
 let inputSearchGroup = document.getElementById('inputSearchGroup');
-let hash = md5(email.value);
 let userAccount = document.getElementById('myAccount');
 let userSettings = document.getElementById('userSettings');
-let quitSetting = document.getElementById("quitSettings")
 
+//defines the socket
+let socket = io();
+//creates a hash for the email
+let hash = md5(email.value);
+//later used variables
+let currentGroup;
 let quitUserSettings;
 
-
+//Draws messages sent by "me"
 function myMessage(item, msg) {
     item.innerHTML = "<div>" +
         "<div class ='meSender'><h3>" + msg["user"] + "</h3></div>" +
@@ -35,6 +38,7 @@ function myMessage(item, msg) {
         "<div><img class='image_user' src='" + msg["userImg"] + "'></div>";
 }
 
+//Draws the current chat groups
 function drawRoom(currentGroup) {
     messages.innerHTML = "";
     socket.emit('choice group', currentGroup);
@@ -43,6 +47,7 @@ function drawRoom(currentGroup) {
     socket.emit("participants group", currentGroup);
 }
 
+//Selects a room when clicked on a group
 function selectRoom() {
     document.querySelectorAll(".room, #addIcon").forEach(function (group) {
         group.addEventListener('click', (e) => {
@@ -68,6 +73,7 @@ function selectRoom() {
     });
 }
 
+//draws messages sent by other users
 function otherMessage(item, msg) {
     item.innerHTML = "<div><img class='image_user' src='" + msg["userImg"] + "'></div>" +
         "<div class='pinned' style='display: none'><i class='las la-thumbtack la-thumbtack-other '></i></div>" +
@@ -78,23 +84,25 @@ function otherMessage(item, msg) {
 
 }
 
+//sends to the server the message and its informations
 message.addEventListener('submit', function (e) {
     e.preventDefault();
     if (inputMessage.value) {
         socket.emit('chat message', {
             message: inputMessage.value,
             userMail: email.value,
-            user: pseudo.value,
+            user: nickname.value,
             userImg: 'https://www.gravatar.com/avatar/' + hash,
             group: currentGroup
         });
+        //resets the input value to nothing
         inputMessage.value = '';
-        socket.emit('noWritingUsers', {writer: pseudo.value, group: currentGroup});
-        console.log(currentGroup);
-        console.log("in sending message ");
+        //emits the message to the server
+        socket.emit('noWritingUsers', {writer: nickname.value, group: currentGroup});
     }
 });
 
+//checks if the message is sent by "me" or by other users
 socket.on('chat message', function (msg) {
     let item = document.createElement('li');
     if (email.value === msg['userMail']) {
@@ -112,15 +120,15 @@ socket.on('chat message', function (msg) {
 
     })
 
-    console.log(msg);
 });
 
+//checks if there is a user typing a message
 socket.on('writingUsers', (writers) => {
     if (writers.length !== 0) {
         writerArea.innerHTML = "<div id ='textWriterArea'>"
         let drawArea = true;
         for (let i = 0; i < writers.length; i++) {
-            if (writers[i] !== pseudo.value) {
+            if (writers[i] !== nickname.value) {
                 writerArea.innerHTML += writers[i] + ", ";
                 drawArea = false;
             }
@@ -137,8 +145,8 @@ socket.on('writingUsers', (writers) => {
 
 });
 
+//draws a message in the chat when a user disconnect from the website
 socket.on('disconnected', (pseudoDc) => {
-    console.log(pseudoDc);
     let item = document.createElement('li');
     item.innerHTML = "<div class='lineConnect'></div>" +
         " <div class='textConnect'>" + pseudoDc + " is disconnected.</div> " +
@@ -151,32 +159,34 @@ socket.on('disconnected', (pseudoDc) => {
 
 login.addEventListener('submit', function (e) {
     e.preventDefault();
+    //sets a hash for user email
     hash = md5(email.value);
+    //emits the new user information
     socket.emit('newUser', {
-        pseudo: pseudo.value,
+        pseudo: nickname.value,
         email: email.value,
         img: 'https://www.gravatar.com/avatar/' + hash,
         socketKey: socket['id'],
         online: true
     });
+    //emits the user's group
     socket.emit("participants group", "general");
+    //draws the user information with his PFP in the top left corner
     myAccount.innerHTML = "<div><img class='image_user' src='https://www.gravatar.com/avatar/" + hash + "'></div>" +
         "<div>" +
-        "<div><h3>" + pseudo.value + "</h3></div>" +
+        "<div><h3>" + nickname.value + "</h3></div>" +
         "<div>" + email.value + "</div>" +
         "</div>"
+    //changes the display of the elements of the page
     listGroup.style.display = "flex";
     myAccount.style.display = "flex";
     connexion.style.display = "none";
 });
 
-
+//draw old messages and messages sent when the user was disconnected
 socket.on('draw old messages', (msg) => {
 
-    console.log("in draw old message ");
-
     for (let i = 0; i < msg.length; i++) {
-        console.log(msg[i]['group']);
         let item = document.createElement('li');
         if (email.value === msg[i]['userMail']) {
             myMessage(item, msg[i]);
@@ -189,11 +199,10 @@ socket.on('draw old messages', (msg) => {
         window.scrollTo(0, document.body.scrollHeight);
     }
     messages.scrollTop = messages.scrollHeight;
-    console.log("");
 });
 
+//draws the different chat groups/rooms
 socket.on('draw groups', (tabGroup) => {
-    console.log(tabGroup);
     groups.innerHTML = "";
     for (let i = 0; i < tabGroup.length; i++) {
         let item = document.createElement('li');
@@ -209,6 +218,7 @@ socket.on('draw groups', (tabGroup) => {
     }
     selectRoom();
 
+    //searches in the existing groups
     inputSearchGroup.addEventListener('input', () => {
         let tmp = 0;
         groups.innerHTML = "";
@@ -234,14 +244,13 @@ socket.on('draw groups', (tabGroup) => {
 
 });
 
+//to not create 2 groups with the same name
 socket.on("select Room with add", () => {
-    console.log("selectRoom")
     selectRoom();
 })
 
-
+//draws online and offline users
 socket.on('participants', (users) => {
-    console.log(users+"lol");
     onlineUsers.innerHTML = "";
     let usersOnline = users.filter(user => user["online"] === true);
     let usersOffline = users.filter(user => user["online"] === false)
@@ -263,6 +272,7 @@ socket.on('participants', (users) => {
 
 })
 
+//draw a message in the chat when a user is connected
 socket.on('connectedUsers', (users) => {
     let item = document.createElement('li');
     item.innerHTML = "<div class='lineConnect'></div> " +
@@ -274,35 +284,34 @@ socket.on('connectedUsers', (users) => {
     messages.scrollTop = messages.scrollHeight;
 });
 
+//emits the writing user informations to the server
 inputMessage.addEventListener('input', () => {
-    console.log("typing");
     if (inputMessage.value !== '') {
-        console.log(pseudo.value);
-        socket.emit('writingUsers', {writer: pseudo.value, group: currentGroup});
+        console.log(nickname.value);
+        socket.emit('writingUsers', {writer: nickname.value, group: currentGroup});
     } else {
-        socket.emit('noWritingUsers', {writer: pseudo.value, group: currentGroup});
+        socket.emit('noWritingUsers', {writer: nickname.value, group: currentGroup});
     }
-    console.log(email.value);
-    console.log(hash);
 });
 
+//creates a new group
 inputSearchGroup.addEventListener('submit', () => {
-    console.log("submit")
     socket.emit("newGroup", {
         name: inputSearchGroup.value.toLowerCase().replace(" ", "_"),
         users: [email.value]
     });
 })
 
+//displays the settings and connected/disconnected users list
 settingsIcon.addEventListener('click', () => {
     settings.style.display = "flex";
-    console.log("clic icon")
     socket.emit("participants group", currentGroup);
     quitSettings.addEventListener('click', () => {
         settings.style.display = 'none';
     })
 });
 
+//creates a new group when the "plus" icon is clicked
 addIcon.addEventListener('click', () => {
     socket.emit("newGroup", {
         name: inputSearchGroup.value.toLowerCase().replace(" ", "_"),
@@ -310,14 +319,14 @@ addIcon.addEventListener('click', () => {
     });
 });
 
+//displays the user settings
 userAccount.addEventListener('click', () => {
-    console.log("user settings click");
     userSettings.style.display = 'flex';
     userSettings.querySelector("img").src = "https://www.gravatar.com/avatar/" + hash + "s=300"
-    document.querySelector("#pseudoUser").innerHTML = pseudo.value;
+    document.querySelector("#pseudoUser").innerHTML = nickname.value;
     document.querySelector("#emailUser").innerHTML = email.value;
 
-
+    //hides the user settings when the "arrow" icon is clicked
     quitUserSettings = document.getElementById('quitUserSettings');
 
     quitUserSettings.addEventListener('click', () => {
@@ -325,11 +334,10 @@ userAccount.addEventListener('click', () => {
     })
 })
 
+//pins a message when clicked on
 messages.addEventListener('click', (e) => {
     e.stopPropagation();
 
-    console.log(e.target.querySelector('.pinned'));
     e.target.querySelector('.pinned').style.display = 'flex';
-
 
 })
